@@ -1,0 +1,1542 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ToothOps Study</title>
+<meta name="description" content="A living study guide: turn your own notes into flashcards and quiz questions, check every draft against the sentence it came from, then study what you approved.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect width='34' height='34' rx='9' fill='%230B1020'/%3E%3Crect x='7' y='11' width='20' height='15' rx='3' fill='%236EF0D0'/%3E%3Cpath d='M12.5 18.5l3 3 6-6.5' fill='none' stroke='%230B1020' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F3EF; --panel:#FFFFFF; --ink:#17171C; --muted:#696975; --line:#E3E1DA; --field:#F7F6F2;
+  --accent:#3B3BD6; --accent-ink:#FFFFFF; --accent-soft:#EAEAFB;
+  --ok:#16794C; --ok-soft:#E3F3EA; --warn:#A14A07; --warn-soft:#FCF0DB; --bad:#B42318; --bad-soft:#FCE9E7;
+  --paper:#FCFBF7; --mark:#FFE58A; --mark-ink:#17171C; --q:#C98A12;
+  --shadow:0 1px 2px rgba(20,20,30,.05),0 8px 24px rgba(20,20,30,.05);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C0D11; --panel:#14161C; --ink:#ECECF1; --muted:#9A9AA8; --line:#262833; --field:#0F1116;
+    --accent:#8B8CF8; --accent-ink:#0C0D11; --accent-soft:#1D1E3A;
+    --ok:#4ADE80; --ok-soft:#0F2619; --warn:#FBBF24; --warn-soft:#2A2110; --bad:#F87171; --bad-soft:#2C1515;
+    --paper:#101218; --mark:#5A4812; --mark-ink:#FFF5CF; --q:#E2A93B; --shadow:none;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C0D11; --panel:#14161C; --ink:#ECECF1; --muted:#9A9AA8; --line:#262833; --field:#0F1116;
+  --accent:#8B8CF8; --accent-ink:#0C0D11; --accent-soft:#1D1E3A;
+  --ok:#4ADE80; --ok-soft:#0F2619; --warn:#FBBF24; --warn-soft:#2A2110; --bad:#F87171; --bad-soft:#2C1515;
+  --paper:#101218; --mark:#5A4812; --mark-ink:#FFF5CF; --q:#E2A93B; --shadow:none;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--accent)}
+kbd{font:600 11px/1 "JetBrains Mono",ui-monospace,monospace;padding:3px 5px;border-radius:5px;border:1px solid var(--line);background:var(--field);color:var(--muted);margin-left:4px}
+.primary kbd{background:transparent;border-color:color-mix(in srgb,var(--accent-ink) 40%,transparent);color:inherit;opacity:.85}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:18px;padding:12px 24px;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brand h1{font:700 18px/1.1 "Space Grotesk",Inter,sans-serif;margin:0;letter-spacing:-.01em;white-space:nowrap}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:12.5px;white-space:nowrap}
+.mark{width:34px;height:34px;flex:none}
+.tabs{display:flex;gap:2px;margin:0 auto;padding:4px;background:var(--field);border:1px solid var(--line);border-radius:12px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{border:0;background:transparent;padding:7px 14px;border-radius:9px;font-weight:600;font-size:14px;color:var(--muted);white-space:nowrap;cursor:pointer;display:flex;align-items:center}
+.tabs button[aria-selected=true]{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.badge{display:inline-grid;place-items:center;min-width:19px;height:19px;padding:0 6px;margin-left:6px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font:700 11px/1 "JetBrains Mono",monospace}
+.topact{display:flex;gap:6px;align-items:center}
+.demo{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:center;padding:8px 16px;background:var(--accent-soft);color:var(--ink);font-size:13.5px;text-align:center}
+main{max-width:1240px;margin:0 auto;padding:22px 24px 90px}
+
+/* basics */
+.btn,button.icon{cursor:pointer;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:9px 14px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:4px;text-decoration:none;color:var(--ink);line-height:1.2}
+.btn:hover{border-color:color-mix(in srgb,var(--ink) 25%,var(--line))}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.ghost{background:transparent}
+.btn.sm{padding:6px 10px;font-size:13px}
+.btn.wide{width:100%;padding:13px}
+.btn.warnbtn{background:var(--bad);color:#fff;border-color:transparent}
+.btn:disabled{opacity:.55;cursor:default;filter:none}
+button.icon{padding:0;width:34px;height:34px;font-size:18px;background:transparent;border-color:transparent;color:var(--muted)}
+button.icon:hover{background:var(--field);border-color:var(--line);color:var(--ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);min-width:0}
+.card h2,.eyebrow{display:flex;align-items:center;gap:10px;margin:0 0 14px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.eyebrow{margin:0}
+.card h2 .sub{margin-left:auto;text-transform:none;letter-spacing:0;font-weight:500;text-align:right}
+.step{display:grid;place-items:center;width:22px;height:22px;flex:none;border-radius:50%;background:var(--ink);color:var(--panel);font-size:12px;letter-spacing:0}
+label{display:block;font-size:13px;font-weight:600;margin:0 0 12px}
+.hint{font-weight:500;color:var(--muted);font-size:13px;margin:8px 0 0}
+.muted{color:var(--muted)}
+input[type=text],input[type=password],input[type=search],select,textarea{display:block;width:100%;margin-top:6px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--field);font-weight:500;min-width:0}
+textarea{resize:vertical;line-height:1.5}
+input:focus,select:focus,textarea:focus{outline:2px solid color-mix(in srgb,var(--accent) 55%,transparent);outline-offset:0;border-color:var(--accent)}
+label.check{display:flex;gap:8px;align-items:center;font-weight:500;margin:0 0 8px}
+label.check input{width:17px;height:17px;margin:0;accent-color:var(--accent);flex:none}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:600;background:var(--field);border:1px solid var(--line);color:var(--ink);white-space:nowrap;text-transform:none;letter-spacing:0}
+.chip small{font:700 10.5px/1 "JetBrains Mono",monospace;color:var(--muted)}
+.chip.quiet{color:var(--muted)}
+.chip.edited{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+.chip.warnchip{background:var(--warn-soft);border-color:transparent;color:var(--warn)}
+.chip.badchip{background:var(--bad-soft);border-color:transparent;color:var(--bad)}
+button.chip{cursor:pointer}
+button.chip:hover{border-color:var(--accent)}
+.alert{border-radius:12px;padding:11px 13px;font-size:13.5px;margin:12px 0 0;line-height:1.45}
+.alert.warn{background:var(--warn-soft);color:var(--ink);border-left:3px solid var(--warn)}
+.alert.bad{background:var(--bad-soft);color:var(--ink);border-left:3px solid var(--bad)}
+.alert.okay{background:var(--ok-soft);color:var(--ink);border-left:3px solid var(--ok)}
+.alert.sm{font-size:13px;padding:9px 11px}
+.empty{color:var(--muted);font-size:14px;margin:0}
+h2.title{font:700 24px/1.15 "Space Grotesk",Inter,sans-serif;letter-spacing:-.015em;margin:0 0 4px;text-transform:none;color:var(--ink)}
+
+/* phases */
+.phases{list-style:none;margin:0 0 18px;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.phase{width:100%;height:100%;display:flex;gap:10px;align-items:flex-start;text-align:left;padding:11px 12px;border-radius:14px;border:1px solid var(--line);background:var(--panel);cursor:pointer}
+.phase .n{display:grid;place-items:center;flex:none;width:24px;height:24px;border-radius:50%;background:var(--field);border:1px solid var(--line);font:700 12px/1 "JetBrains Mono",monospace;color:var(--muted)}
+.phase b{display:block;font-size:13.5px}
+.phase small{display:block;color:var(--muted);font-size:12px;margin-top:1px}
+.phase.done .n{background:var(--ok);border-color:var(--ok);color:var(--panel)}
+.phase.now{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.phase.now .n{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+
+/* notes */
+.split{display:grid;grid-template-columns:minmax(300px,420px) minmax(0,1fr);gap:16px;align-items:start}
+.stack{display:flex;flex-direction:column;gap:16px;min-width:0}
+.srclist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.srclist li{display:flex;align-items:center;gap:4px;border-radius:12px;border:1px solid transparent}
+.srclist li.on{background:var(--field);border-color:var(--line)}
+.srcbtn{flex:1;min-width:0;text-align:left;background:transparent;border:0;padding:9px 10px;cursor:pointer;border-radius:12px}
+.srcbtn b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.srcbtn small{color:var(--muted);font-size:12.5px}
+.engines{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:4px;background:var(--field);border:1px solid var(--line);border-radius:12px;margin-bottom:14px}
+.eng{border:0;background:transparent;text-align:left;padding:8px 9px;border-radius:9px;cursor:pointer;min-width:0}
+.eng b{display:block;font-size:13.5px}
+.eng small{display:block;font-size:11.5px;color:var(--muted);line-height:1.3}
+.eng[aria-checked=true]{background:var(--panel);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.keyrow{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:10px}
+.pastesteps{margin:0 0 12px;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.pastesteps li::marker{font-weight:700;color:var(--muted)}
+.genopts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:14px;align-items:start;margin:12px 0 14px;padding-top:14px;border-top:1px solid var(--line)}
+.range output{font:700 13px "JetBrains Mono",monospace}
+.range input{width:100%;margin-top:10px;accent-color:var(--accent)}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+legend{font-size:13px;font-weight:600;margin-bottom:6px;padding:0}
+.types{display:flex;flex-direction:column}
+.status{margin:10px 0 0;font-size:13.5px;color:var(--muted)}
+.note-ok{margin:0 0 4px;font-size:13.5px;color:var(--muted)}
+.concepts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:14px}
+.concepts .eyebrow{margin-right:4px}
+.legend{display:flex;gap:6px;align-items:center;font-size:12px}
+.sw{display:inline-block;width:14px;height:4px;border-radius:2px;margin-left:8px}
+.sw.lib{background:var(--ok)}
+.sw.q{background:var(--q)}
+.notetext{font:400 15.5px/1.7 Fraunces,Georgia,serif;white-space:pre-wrap;word-wrap:break-word;max-height:560px;overflow:auto;padding:16px 18px;background:var(--paper);border:1px solid var(--line);border-radius:12px}
+.cov{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;cursor:pointer}
+.cov.lib{text-decoration-color:var(--ok)}
+.cov.q{text-decoration-color:var(--q);text-decoration-style:dashed}
+.flashmark{animation:flashmark 2.2s ease-out}
+@keyframes flashmark{0%,40%{background:var(--mark);color:var(--mark-ink)}100%{background:transparent}}
+.howto{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0 18px}
+.howto div{padding:14px;border-radius:12px;background:var(--field);border:1px solid var(--line);font-size:13.5px}
+.howto b{display:block;font-family:"Space Grotesk",Inter,sans-serif;font-size:15px;margin-bottom:4px}
+
+/* review */
+.rvhead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.rvhead p{margin:0;max-width:62ch}
+.rvtools{display:flex;gap:6px;align-items:center}
+.rvtools select{width:auto;margin:0;max-width:220px;padding:8px 10px}
+.count{font:700 13px "JetBrains Mono",monospace;color:var(--muted);padding:0 6px;white-space:nowrap}
+.rv{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.pane{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);min-width:0}
+.pane.src{background:var(--paper)}
+.panehead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.panehead .eyebrow{margin-right:auto}
+.trace{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700}
+.trace::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.trace.ok{color:var(--ok)} .trace.warn{color:var(--warn)} .trace.bad{color:var(--bad)}
+.crumb{font-size:12.5px;color:var(--muted);margin-bottom:8px;font-weight:600}
+.excerpt{font:400 16.5px/1.7 Fraunces,Georgia,serif;white-space:pre-wrap;word-wrap:break-word;max-height:400px;overflow:auto;margin:0 0 12px}
+.mdh{font:700 .9em/1.6 "Space Grotesk",Inter,sans-serif;letter-spacing:.005em}
+mark.hl{background:var(--mark);color:var(--mark-ink);border-radius:3px;padding:1px 2px;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.fl textarea{font-size:15.5px}
+.opts{margin:0 0 12px}
+.optrow{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.optrow input[type=radio]{width:18px;height:18px;accent-color:var(--ok);flex:none;margin:0}
+.optrow input[type=text]{margin:0}
+.actions{display:grid;grid-template-columns:1.5fr 1fr auto;gap:8px;margin-top:6px}
+.reasons p{margin:0 0 8px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.btnchip{padding:7px 11px;font-size:13px}
+.btnchip kbd{margin:0 2px 0 0}
+.confirm{background:var(--bad-soft);border-radius:12px;padding:12px}
+.confirm p{margin:0 0 10px;font-weight:600}
+.kbdhelp{color:var(--muted);font-size:12.5px;margin:14px 0 0;text-align:center}
+.emptybig{max-width:560px;margin:40px auto;text-align:center}
+.emptybig p{color:var(--muted)}
+.emptybig .btnrow{justify-content:center;margin-top:16px}
+
+/* library */
+.libbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.libbar input,.libbar select{margin:0}
+.libbar input{flex:1 1 320px}
+.libbar select{flex:0 1 180px;width:auto}
+.liblist{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.lrow{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.lrow.open{box-shadow:var(--shadow);border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+.lmain{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:4px 18px;width:100%;text-align:left;background:transparent;border:0;padding:13px 16px;cursor:pointer}
+.lf{font-weight:600;white-space:pre-line}
+.lb{color:var(--muted)}
+.lmeta{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.pips{display:inline-flex;gap:3px;margin-left:auto}
+.pips i{width:12px;height:5px;border-radius:2px;background:var(--line)}
+.pips i.on{background:var(--ok)}
+.ldetail{padding:0 16px 16px;border-top:1px solid var(--line)}
+.quote{margin:14px 0 12px;padding:10px 14px;border-left:3px solid var(--mark);background:var(--paper);border-radius:0 10px 10px 0;font:400 15px/1.6 Fraunces,Georgia,serif}
+.quote small{display:block;font:600 12px/1.4 Inter,sans-serif;color:var(--muted);margin-top:6px}
+.optlist{margin:10px 0 0;padding-left:20px}
+.optlist li.right{font-weight:700;color:var(--ok)}
+mark.q{background:var(--mark);color:var(--mark-ink);border-radius:2px;padding:0 1px}
+
+/* study */
+.narrow{max-width:560px;margin:0 auto}
+.seg2{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--field);border:1px solid var(--line);border-radius:12px;margin-bottom:14px}
+.seg2 button{border:0;background:transparent;text-align:left;padding:10px 12px;border-radius:9px;cursor:pointer}
+.seg2 button b{display:block}
+.seg2 button small{color:var(--muted);font-size:12px}
+.seg2 button[aria-checked=true]{background:var(--panel);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.studywrap{max-width:720px;margin:0 auto}
+.sbar{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.prog{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.flash{background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:34px 30px;min-height:300px;display:flex;flex-direction:column;justify-content:center;gap:18px;text-align:center}
+.ff{font:600 23px/1.35 "Space Grotesk",Inter,sans-serif;white-space:pre-line;letter-spacing:-.01em}
+.fb{font:500 19px/1.45 Inter,sans-serif;color:var(--ink);padding-top:18px;border-top:1px dashed var(--line);white-space:pre-line}
+.blank{display:inline-block;min-width:80px;border-bottom:3px solid var(--accent);color:transparent}
+.fill{background:var(--accent-soft);color:var(--accent);border-radius:4px;padding:0 4px}
+.srcnote{font:400 14.5px/1.55 Fraunces,Georgia,serif;color:var(--muted);text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.srcnote small{display:block;font:600 11.5px/1.3 Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.grades{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.grades .btn{flex-direction:column;padding:12px 8px}
+.grades .btn small{font-weight:500;color:var(--muted);font-size:12px}
+.g0{border-color:color-mix(in srgb,var(--bad) 50%,var(--line))!important}
+.g2{border-color:color-mix(in srgb,var(--ok) 55%,var(--line))!important}
+.choices{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.choice{justify-content:flex-start!important;text-align:left;padding:13px 14px!important;font-weight:500!important;font-size:15.5px!important}
+.choice .k{font:700 12px "JetBrains Mono",monospace;color:var(--muted);margin-right:8px}
+.choice.right{background:var(--ok-soft);border-color:var(--ok);font-weight:700!important}
+.choice.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.choice.dim{opacity:.55}
+.verdict{font-weight:700;margin:12px 0 0;text-align:center}
+.verdict.ok{color:var(--ok)} .verdict.no{color:var(--bad)}
+.score{font:700 54px/1 "Space Grotesk",Inter,sans-serif;letter-spacing:-.02em;margin:6px 0}
+.missed{list-style:none;padding:0;margin:14px 0 0;text-align:left;display:flex;flex-direction:column;gap:6px}
+.missed li{padding:10px 12px;border-radius:10px;background:var(--field);border:1px solid var(--line);font-size:14px}
+.missed li span{color:var(--muted);display:block}
+
+/* progress */
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow)}
+.kpi b{display:block;font:700 30px/1.1 "Space Grotesk",Inter,sans-serif;letter-spacing:-.02em}
+.kpi span{color:var(--muted);font-size:13px;font-weight:500}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.funnel{display:flex;gap:2px;height:16px;margin:4px 0 12px}
+.funnel i{display:block;height:100%;min-width:4px}
+.funnel i:first-child{border-radius:4px 0 0 4px}
+.funnel i:last-child{border-radius:0 4px 4px 0}
+.funnel i:only-child{border-radius:4px}
+.f-ok{background:var(--ok)} .f-ed{background:var(--accent)} .f-bad{background:var(--bad)} .f-q{background:var(--line)}
+.flegend{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:13.5px}
+.flegend li{display:flex;align-items:center;gap:8px}
+.flegend i{width:10px;height:10px;border-radius:3px;flex:none}
+.flegend b{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:13px}
+table.mini{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:4px}
+table.mini th{text-align:left;font-weight:600;color:var(--muted);font-size:12px;padding:6px 6px 6px 0;border-bottom:1px solid var(--line)}
+table.mini td{padding:7px 6px 7px 0;border-bottom:1px solid var(--line)}
+table.mini td.n,table.mini th.n{text-align:right;font-family:"JetBrains Mono",monospace;font-size:12.5px}
+.edits{display:flex;flex-direction:column;gap:10px}
+.edit{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;font-size:13.5px}
+.edit div{padding:10px 12px;border-radius:10px;background:var(--field);border:1px solid var(--line);white-space:pre-line}
+.edit div small{display:block;font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.edit .before{text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--bad) 60%,transparent);color:var(--muted)}
+.obs{margin:0;padding-left:18px;font-size:14px;display:flex;flex-direction:column;gap:6px}
+#writeup{min-height:240px;font-size:14px}
+
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(10,10,20,.35);z-index:40}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);z-index:41;background:var(--panel);border-left:1px solid var(--line);overflow:auto;padding:18px 20px 40px;box-shadow:-10px 0 40px rgba(0,0,0,.12)}
+.drawer h3{font:700 13px/1.2 Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:22px 0 10px}
+.drawer section{padding-bottom:6px;border-bottom:1px solid var(--line)}
+.drawer section:last-child{border-bottom:0}
+.drawer p{font-size:13.5px;margin:0 0 10px;color:var(--muted)}
+.dhead{display:flex;justify-content:space-between;align-items:center}
+.dhead h2{font:700 20px "Space Grotesk",Inter,sans-serif;margin:0}
+.seg3{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;background:var(--field);border:1px solid var(--line);border-radius:12px}
+.seg3 button{border:0;background:transparent;padding:7px;border-radius:9px;cursor:pointer;font-weight:600;font-size:13.5px}
+.seg3 button[aria-checked=true]{background:var(--panel);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.lockon{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--ok);margin-bottom:10px}
+.inline{display:flex;gap:8px;align-items:center;font-size:13.5px;font-weight:500;margin-bottom:10px}
+.inline select{width:auto;margin:0;padding:6px 8px}
+
+/* lock screen */
+.lock{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:16px;background:var(--bg)}
+.lockbox{width:min(380px,100%);background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:28px 24px;text-align:center;box-shadow:var(--shadow)}
+.lockbox .mark{width:52px;height:52px;margin:0 auto 12px;display:block}
+.lockbox h1{font:700 22px "Space Grotesk",Inter,sans-serif;margin:0 0 4px}
+.lockbox p{color:var(--muted);margin:0 0 16px;font-size:14px}
+.lockbox input{margin:0 0 10px;text-align:center}
+.err{color:var(--bad)!important;font-weight:600;min-height:1.4em;margin:10px 0 0!important}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:13px;margin-top:6px}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:12px;max-width:calc(100% - 32px);padding:10px 12px 10px 16px;border-radius:12px;background:var(--ink);color:var(--bg);font-weight:600;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.toast .btn{background:transparent;color:var(--bg);border-color:color-mix(in srgb,var(--bg) 35%,transparent)}
+
+@media (max-width:1020px){
+  .split,.rv,.grid2{grid-template-columns:minmax(0,1fr)}
+  .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:760px){
+  .top{flex-wrap:wrap;padding:10px 16px;gap:10px}
+  .brand p{display:none}
+  .tabs{order:3;width:100%;margin:0;justify-content:space-between}
+  .tabs button{padding:7px 9px;font-size:13.5px}
+  .badge{margin-left:4px;min-width:17px;height:17px;padding:0 4px;font-size:10px}
+  .excerpt{max-height:260px;font-size:16px}
+  .libbar select{flex:1 1 140px}
+  .card h2 .legend{display:none}
+  .topact{margin-left:auto}
+  main{padding:16px 16px 90px}
+  .phases{grid-template-columns:repeat(5,minmax(150px,1fr));overflow-x:auto;padding-bottom:4px}
+  .engines{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .keyrow,.genopts,.howto,.edit{grid-template-columns:minmax(0,1fr)}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .lmain{grid-template-columns:minmax(0,1fr)}
+  .actions{grid-template-columns:1fr 1fr}
+  .actions .ghost{grid-column:1/-1}
+  .flash{padding:26px 18px;min-height:240px}
+  .ff{font-size:20px}
+  .kbdhelp{display:none}
+  .flegend{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app" hidden>
+  <div class="demo" id="demoBar" hidden><span><b>Demo</b> with sample notes. Nothing you do here is saved.</span><a href="./">Start your own study guide →</a></div>
+  <header class="top">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 34 34" aria-hidden="true">
+        <rect width="34" height="34" rx="9" fill="#0B1020"/>
+        <rect x="10" y="6.5" width="17" height="12" rx="2.6" fill="#B49CFF" opacity=".55" transform="rotate(-9 18.5 12.5)"/>
+        <rect x="7" y="11" width="20" height="15" rx="3" fill="#6EF0D0"/>
+        <path d="M12.5 18.5l3 3 6-6.5" fill="none" stroke="#0B1020" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div><h1>ToothOps Study</h1><p>Your notes, checked into cards.</p></div>
+    </div>
+    <nav class="tabs" aria-label="Sections">
+      <button data-tab="notes">Notes</button>
+      <button data-tab="review">Review<span class="badge" id="bQueue" hidden></span></button>
+      <button data-tab="library">Library</button>
+      <button data-tab="study">Study<span class="badge" id="bDue" hidden></span></button>
+      <button data-tab="progress">Progress</button>
+    </nav>
+    <div class="topact">
+      <button class="btn sm ghost" id="lockBtn" hidden title="Lock now">Lock</button>
+      <button class="icon" id="gear" aria-label="Settings" title="Settings">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </header>
+  <main id="view" tabindex="-1"></main>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-label="Settings"></aside>
+
+<div class="lock" id="lock" hidden>
+  <form class="lockbox" id="lockForm" autocomplete="off">
+    <svg class="mark" viewBox="0 0 34 34" aria-hidden="true">
+      <rect width="34" height="34" rx="9" fill="#0B1020"/>
+      <rect x="10" y="6.5" width="17" height="12" rx="2.6" fill="#B49CFF" opacity=".55" transform="rotate(-9 18.5 12.5)"/>
+      <rect x="7" y="11" width="20" height="15" rx="3" fill="#6EF0D0"/>
+      <path d="M12.5 18.5l3 3 6-6.5" fill="none" stroke="#0B1020" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h1>ToothOps Study</h1>
+    <p>Locked. Your notes and cards are encrypted on this device.</p>
+    <input type="password" id="lockPass" placeholder="Passphrase" aria-label="Passphrase" autocomplete="current-password" required>
+    <button class="btn primary wide" type="submit" id="unlockBtn">Unlock</button>
+    <p class="err" id="lockErr" role="alert"></p>
+    <button type="button" class="linkbtn" id="lockForgot">Forgot your passphrase?</button>
+  </form>
+</div>
+
+<div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
+<input type="file" id="backupFile" accept=".json,application/json" hidden>
+
+<script>
+'use strict';
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-4);
+const DAY=864e5;
+const dkey=(t=Date.now())=>{const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const plural=(n,w,p)=>n+' '+(n===1?w:(p||w+'s'));
+const cap=s=>s?s[0].toUpperCase()+s.slice(1):s;
+const trunc=(s,n)=>s.length>n?s.slice(0,n-1).trimEnd()+'…':s;
+const words=s=>(s.match(/\S+/g)||[]).length;
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const escRe=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+const pct=(a,b)=>b?Math.round(100*a/b):0;
+const fkey=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+const b64=buf=>{const a=new Uint8Array(buf);let s='';for(let i=0;i<a.length;i+=0x8000)s+=String.fromCharCode.apply(null,a.subarray(i,i+0x8000));return btoa(s)};
+const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+
+/* ---------- constants ---------- */
+const K_DATA='toothops-study:data', K_VAULT='toothops-study:vault', K_KEYS='toothops-study:keys';
+const PARAMS=new URLSearchParams(location.search);
+const DEMO=PARAMS.has('demo');
+const TABS=['notes','review','library','study','progress'];
+const REASONS=['Wrong or misleading','Not in my notes','Too vague','Too easy','Duplicate'];
+const TYPE_LABEL={qa:'Flashcard',cloze:'Fill-in',mcq:'Multiple choice'};
+const BOX_DAYS=[0,1,3,7,16,35];
+const PROV={
+  builtin:{name:'Built-in',tag:'No key, on device'},
+  claude:{name:'Claude',tag:'Your Anthropic key',vendor:'Anthropic',keyUrl:'https://console.anthropic.com/settings/keys',keyHost:'console.anthropic.com',ph:'sk-ant-…',models:['claude-opus-5-5','claude-sonnet-5-5','claude-haiku-5-5']},
+  gemini:{name:'Gemini',tag:'Your Google key',vendor:'Google',keyUrl:'https://aistudio.google.com/app/apikey',keyHost:'aistudio.google.com',ph:'AIza…',models:['gemini-flash-latest','gemini-pro-latest']},
+  openai:{name:'OpenAI',tag:'Your OpenAI key',vendor:'OpenAI',keyUrl:'https://platform.openai.com/api-keys',keyHost:'platform.openai.com',ph:'sk-…',models:['gpt-5-mini','gpt-5']},
+  paste:{name:'Paste-in',tag:'Any chatbot, no key'}
+};
+const SAMPLE={title:'Endo: pulpal & periapical diagnosis',text:`# Pulpal and Periapical Diagnosis
+
+## Pulp testing
+Cold testing is the most common thermal test for pulp sensibility.
+A refrigerant spray is applied on a cotton pellet to the middle third of the buccal surface.
+The electric pulp test (EPT) shows whether pulp nerve fibers can respond; it does not measure blood supply.
+EPT can give false negatives in recently traumatized teeth and in teeth with immature apices.
+A-delta fibers are myelinated nerve fibers that carry sharp, well-localized pain.
+C fibers are unmyelinated nerve fibers that carry dull, aching, poorly localized pain.
+Always test adjacent and contralateral teeth first so the patient knows what a normal response feels like.
+
+## Pulpal diagnoses
+- Normal pulp: symptom-free and responds normally to pulp testing.
+- Reversible pulpitis: inflammation that should resolve once the cause is removed; cold causes sharp pain that fades within a few seconds.
+- Symptomatic irreversible pulpitis: lingering thermal pain, spontaneous pain and referred pain; the pulp cannot heal.
+- Asymptomatic irreversible pulpitis: no symptoms, but deep caries or trauma means the pulp will not heal.
+- Pulp necrosis: death of the dental pulp; the tooth does not respond to pulp testing.
+
+Lingering pain is usually defined as pain lasting more than 30 seconds after the stimulus is removed.
+Treatment for irreversible pulpitis is root canal therapy or extraction.
+
+## Apical diagnoses
+- Normal apical tissues: not sensitive to percussion or palpation, with an intact lamina dura and a uniform PDL space.
+- Symptomatic apical periodontitis: inflammation of the apical periodontium that causes pain on biting, percussion or palpation.
+- Asymptomatic apical periodontitis: an apical radiolucency without clinical symptoms.
+- Acute apical abscess: rapid onset, spontaneous pain, tenderness to pressure, pus formation and swelling.
+- Chronic apical abscess: gradual onset with little or no discomfort and intermittent drainage through a sinus tract.
+- Condensing osteitis: a diffuse radiopaque lesion at the apex that reflects a bony reaction to low-grade inflammation.
+
+Percussion tests the periodontal ligament, not the pulp.
+A sinus tract should be traced with a gutta-percha cone on a radiograph to find its source.
+
+## Quick numbers
+The primary dentition has 20 teeth and the permanent dentition has 32.
+Root formation is usually complete about three years after a permanent tooth erupts.
+`};
+
+/* ---------- state ---------- */
+let S=null, U=null, KEYS={}, cryptoKey=null, vaultMeta=null, lastActive=Date.now();
+function blank(){return{v:1,sources:[],cards:[],days:{},settings:{engine:'builtin',max:20,types:{qa:true,cloze:true,mcq:true},models:{claude:'claude-opus-5-5',gemini:'gemini-flash-latest',openai:'gpt-5-mini'},remember:false,keys:{},theme:'system',autolock:15},created:Date.now()}}
+function migrate(s){
+  const b=blank(); s=s&&typeof s==='object'?s:b;
+  s.sources=Array.isArray(s.sources)?s.sources:[]; s.cards=Array.isArray(s.cards)?s.cards:[]; s.days=s.days&&typeof s.days==='object'?s.days:{};
+  s.settings=Object.assign(b.settings,s.settings||{});
+  s.settings.types=Object.assign(blank().settings.types,s.settings.types||{});
+  s.settings.models=Object.assign(blank().settings.models,s.settings.models||{});
+  s.settings.keys=s.settings.keys||{};
+  return s;
+}
+function freshUI(){return{tab:'notes',sel:null,draft:{title:'',text:''},nMsg:'',gen:{busy:false,msg:'',err:''},paste:'',r:{idx:0,src:'',discard:false,confirm:false,cur:null},lib:{q:'',src:'',type:'',sort:'note',open:null,edit:false},study:null,studyCfg:{mode:'flash',deck:'due',n:'20'},writeup:null,focusA:null,drawer:false}}
+const srcById=id=>S.sources.find(s=>s.id===id);
+const cardById=id=>S.cards.find(c=>c.id===id);
+
+/* ---------- persistence + lock ---------- */
+let saveTimer=null;
+function save(){if(DEMO)return;clearTimeout(saveTimer);saveTimer=setTimeout(persist,200)}
+async function persist(){
+  clearTimeout(saveTimer);saveTimer=null;
+  if(DEMO||!S)return;
+  const data=JSON.stringify(S);
+  try{
+    if(cryptoKey){
+      const iv=crypto.getRandomValues(new Uint8Array(12));
+      const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},cryptoKey,new TextEncoder().encode(data));
+      localStorage.setItem(K_VAULT,JSON.stringify({v:1,iter:vaultMeta.iter,salt:b64(vaultMeta.salt),iv:b64(iv),ct:b64(ct)}));
+      localStorage.removeItem(K_DATA);
+    }else{
+      localStorage.setItem(K_DATA,data);
+      localStorage.removeItem(K_VAULT);
+    }
+  }catch(e){toast(e&&e.name==='QuotaExceededError'?'Browser storage is full. Export a backup, then delete a large note.':'Couldn’t save: '+(e&&e.message||e))}
+}
+async function deriveKey(pass,salt,iter){
+  const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:iter,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function setPassphrase(pass){
+  const salt=crypto.getRandomValues(new Uint8Array(16)), iter=310000;
+  cryptoKey=await deriveKey(pass,salt,iter); vaultMeta={salt,iter};
+  if(S.settings.remember)Object.assign(S.settings.keys,KEYS);
+  await persist();
+}
+async function unlock(pass){
+  const v=JSON.parse(localStorage.getItem(K_VAULT));
+  const salt=unb64(v.salt), key=await deriveKey(pass,salt,v.iter);
+  let pt; try{pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(v.iv)},key,unb64(v.ct))}catch{throw new Error('That passphrase didn’t work.')}
+  S=migrate(JSON.parse(new TextDecoder().decode(pt))); cryptoKey=key; vaultMeta={salt,iter:v.iter}; lastActive=Date.now();
+  startApp();
+}
+async function lockNow(){
+  if(!cryptoKey||!S)return;
+  await persist();
+  KEYS={}; try{sessionStorage.removeItem(K_KEYS)}catch{}
+  cryptoKey=null; vaultMeta=null; closeDrawer(); showLock();
+}
+function showLock(){S=null;U=null;$('#app').hidden=true;$('#lock').hidden=false;$('#lockErr').textContent='';$('#lockPass').value='';setTimeout(()=>$('#lockPass').focus(),40)}
+function loadKeys(){try{KEYS=JSON.parse(sessionStorage.getItem(K_KEYS)||'{}')||{}}catch{KEYS={}}}
+const getKey=p=>KEYS[p]||(S&&S.settings.keys[p])||'';
+function setKey(p,v){
+  v=v.trim(); if(v)KEYS[p]=v; else delete KEYS[p];
+  try{sessionStorage.setItem(K_KEYS,JSON.stringify(KEYS))}catch{}
+  if(S.settings.remember){if(v)S.settings.keys[p]=v;else delete S.settings.keys[p]}
+  save();
+}
+
+/* ---------- boot ---------- */
+function boot(){
+  loadKeys();
+  if(DEMO){S=blank();U=freshUI();demoSetup();startApp();return}
+  let vault=null,raw=null;
+  try{vault=localStorage.getItem(K_VAULT);raw=localStorage.getItem(K_DATA)}catch{}
+  if(vault){showLock();return}
+  try{S=migrate(raw?JSON.parse(raw):null)}catch{S=blank()}
+  startApp();
+}
+function startApp(){
+  U=U||freshUI(); applyTheme(); fromHash();
+  $('#lock').hidden=true; $('#app').hidden=false; render();
+}
+function applyTheme(){const t=S&&S.settings.theme||'system';if(t==='system')delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=t}
+function fromHash(){const h=location.hash.slice(1);if(TABS.includes(h))U.tab=h}
+function go(tab){if(location.hash==='#'+tab){U.tab=tab;render();window.scrollTo(0,0)}else location.hash=tab}
+window.addEventListener('hashchange',()=>{if(!S)return;fromHash();render();window.scrollTo(0,0)});
+
+/* ---------- text segmentation ---------- */
+const STOP=new Set(('a an the of to in on for and or but nor with without by from as at is are was were be been being it its this that these those there their they them then than so such not no can may might will would should could do does did has have had into onto over under about after before during between within per via each any all some more most less least very also only just both either neither whether while when where which who whom whose what why how if because although though your you our we us me my he she his her one two').split(' '));
+const PRON=new Set('it its this that these those they there here he she we you i which what when where why how if because although though all some most many each every both such one often always never also'.split(' '));
+const GENERIC=new Set('treatment treatments cause causes etiology signs symptoms example examples note notes location function functions definition diagnosis tip tips key important remember rule rules management indication indications contraindication contraindications features findings prognosis summary overview purpose goal goals'.split(' '));
+const clean=s=>s.replace(/\*\*|__|`/g,'').replace(/(^|[\s(])[*_]([^*_\s][^*_]*?)[*_](?=[\s).,;:!?]|$)/g,'$1$2').replace(/\s+/g,' ').trim();
+const stem=w=>w.length>4?w.replace(/ies$/,'y').replace(/(?:ing|ed|es|s)$/,''):w;
+const toks=s=>new Set((String(s).toLowerCase().match(/[a-z0-9]+(?:-[a-z0-9]+)*/g)||[]).filter(w=>w.length>2&&!STOP.has(w)).map(stem));
+const segCache=new Map();
+function segment(text){
+  if(segCache.has(text))return segCache.get(text);
+  const segs=[], lines=text.split('\n'); let off=0, heading='', block=0, prevBlank=true;
+  for(let i=0;i<lines.length;i++){
+    const raw=lines[i], ls=off; off+=raw.length+1;
+    const t=raw.trim();
+    if(!t){block++;prevBlank=true;continue}
+    const lead=raw.length-raw.trimStart().length, nextT=(lines[i+1]||'').trim(), wc=t.split(/\s+/).length;
+    const md=t.match(/^#{1,6}\s+(.+)$/);
+    const bm=t.match(/^(?:[-*•‣◦▪–]|\d{1,2}[.)]|[a-hA-H][.)])\s+/);
+    const allCaps=/[A-Z]/.test(t)&&!/[a-z]/.test(t)&&wc<=8&&!/[.!?]$/.test(t);
+    const colonHead=/:$/.test(t)&&wc<=8;
+    const shortHead=wc<=5&&!/[.!?;:,]$/.test(t)&&prevBlank&&!!nextT;
+    if(md||(!bm&&(allCaps||colonHead||shortHead))){heading=clean((md?md[1]:t).replace(/:$/,''));block++;prevBlank=false;continue}
+    prevBlank=false;
+    const cut=bm?bm[0].length:0, bodyOff=ls+lead+cut, body=t.slice(cut), isB=!!bm;
+    const push=(a,b)=>{const piece=body.slice(a,b),tr=piece.trim();if(tr.replace(/[^A-Za-z0-9]/g,'').length<3)return;const s0=a+piece.indexOf(tr);segs.push({start:bodyOff+s0,end:bodyOff+s0+tr.length,raw:tr,text:clean(tr),heading,block,bullet:isB})};
+    const re=/[.!?]["')\]]*\s+(?=["'(\[]?[A-Z0-9])/g; let last=0,m;
+    while((m=re.exec(body))){
+      const before=body.slice(0,m.index+1);
+      if(/\b(?:e\.g|i\.e|vs|etc|approx|Dr|Mr|Mrs|Ms|Fig|cf|ca|No|al)\.$/i.test(before)||/(?:^|\s)[A-Z]\.$/.test(before))continue;
+      push(last,m.index+m[0].length); last=m.index+m[0].length;
+    }
+    push(last,body.length);
+  }
+  segCache.set(text,segs); if(segCache.size>40)segCache.delete(segCache.keys().next().value);
+  return segs;
+}
+
+/* ---------- built-in extractor ---------- */
+const lcFirst=s=>/^[A-Z][a-z]/.test(s)&&!/^[A-Z][a-z]+[A-Z]/.test(s)?s[0].toLowerCase()+s.slice(1):s;
+const isPlural=s=>{const w=s.trim().split(/\s+/).pop().toLowerCase().replace(/[^a-z]/g,'');return w.length>3&&/s$/.test(w)&&!/(ss|us|is|ys)$/.test(w)};
+function subjOK(s){
+  const w=s.trim().split(/\s+/);
+  if(w.length>8||!/[A-Za-z]/.test(s)||/[,;]/.test(s))return false;
+  if(PRON.has(w[0].toLowerCase()))return false;
+  if(/\b(can|should|may|might|must|will|would|could|cannot)\b/i.test(s))return false;
+  return true;
+}
+function defPattern(t){
+  const m=t.match(/^([^:;]{2,60}?)\s*:\s+(.{6,})$/)||t.match(/^([^:;–—]{2,50}?)\s+[–—-]\s+(.{6,})$/)||t.match(/^([^=]{2,40}?)\s*=\s*(.{4,})$/);
+  if(!m)return null;
+  const term=m[1].trim().replace(/^\*+|\*+$/g,''), def=m[2].trim();
+  if(term.split(/\s+/).length>7||def.split(/\s+/).length<3||!/[A-Za-z]/.test(term)||/[.!?]$/.test(term))return null;
+  return{term,def};
+}
+const COP=/^(.{2,80}?)\s+(is defined as|are defined as|is called|are called|is known as|are known as|refers to|refer to|means|describes|represents|is|are)\s+(.+)$/i;
+function copula(t){
+  const m=t.match(COP); if(!m)return null;
+  let[,subj,verb,pred]=m; verb=verb.toLowerCase();
+  if(!subjOK(subj))return null;
+  pred=pred.replace(/^(?:usually|often|generally|typically|commonly|always|also|essentially|basically|simply)\s+/i,'');
+  const p2=pred.replace(/^(?:defined as|called|known as|described as)\s+/i,'');
+  const named=/called|known as/.test(verb)||(/^(?:called|known as)\s/i.test(pred));
+  const defined=p2!==pred||/defined|called|known/.test(verb);
+  const subjCore=subj.replace(/^(?:the|a|an)\s+/i,''), generic=GENERIC.has(subjCore.split(/\s+/)[0].toLowerCase());
+  if(p2.split(/\s+/).length<(named?1:3))return null;
+  if((verb==='is'||verb==='are')&&!defined&&!generic){
+    const ws=p2.split(/\s+/), first=ws[0].toLowerCase();
+    const art=/^(a|an|the|one|any)$/.test(first);
+    const plur=verb==='are'&&ws.slice(0,4).some(w=>isPlural(w));
+    if(!art&&!plur)return null;
+  }
+  if(named)return{kind:'named',subj,term:p2.replace(/[.;]$/,'')};
+  return{kind:'def',term:subj,def:p2,generic,subjCore};
+}
+const FUNC=/^(.{2,70}?)\s+(shows|measures|tests|detects|indicates|suggests|carries|causes|produces|prevents|reduces|increases|decreases|inhibits|stimulates|controls|supplies|innervates|drains|contains|requires|leads to|lead to|results in|result in)\s+(.+)$/i;
+function funcPattern(t){
+  const m=t.match(FUNC); if(!m)return null;
+  const[,subj,verb,rest]=m; if(!subjOK(subj)||rest.split(/\s+/).length<2)return null;
+  if(/^(are|is|was|were|can|could|may|might|should|will|would|have|has|had|do|does|did|of|in|and|or)\b/i.test(rest))return null;
+  const v=verb.toLowerCase(), parts=v.split(' '), head=parts[0], tail=parts[1]?' '+parts[1]:'';
+  const third=/s$/.test(head)&&!/ss$/.test(head);
+  const base=third?head.replace(/ies$/,'y').replace(/(sh|ch|ss|x|z)es$/,'$1').replace(/s$/,''):head;
+  const aux=third?'does':'do';
+  return{subj,front:`What ${aux} ${lcFirst(subj)} ${base}${tail}?`,back:cap(rest)};
+}
+function enumPattern(t){
+  const m=t.match(/^(.{3,80}?)\s+(includes|include|consists of|consist of|are)\s*:?\s+(.+)$/i); if(!m)return null;
+  const[,subj,verb,rest]=m; if(!subjOK(subj))return null;
+  const items=rest.replace(/[.;]$/,'').split(/\s*,\s*(?:and\s+|or\s+)?|\s+(?:and|or)\s+/).map(s=>s.trim()).filter(Boolean);
+  if(items.length<3||items.some(s=>s.split(/\s+/).length>6))return null;
+  if(/^are$/i.test(verb)&&!/\b(types?|kinds?|classes|stages|forms|signs|parts|components|causes|steps|phases|layers|branches|zones|features|two|three|four|five|six|seven)\b/i.test(subj))return null;
+  const front=/^are$/i.test(verb)?`What are ${lcFirst(subj)}? (${items.length})`:`What ${isPlural(subj)?'do':'does'} ${lcFirst(subj)} include? (${items.length})`;
+  return{subj,front,back:cap(rest)};
+}
+const NUMW='one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty|fifty|sixty|hundred';
+const UNITS='percent|mm|cm|µm|nm|ml|mL|mg|mcg|g|kg|°C|°F|degrees?|seconds?|secs?|minutes?|mins?|hours?|hrs?|days?|weeks?|months?|years?|teeth|roots?|canals?|cusps?|times|ppm|mmHg';
+const NUM_RE=new RegExp(`(?<![\\w-])(?:\\d+(?:[.,]\\d+)?(?:\\s?(?:-|–|to)\\s?\\d+(?:[.,]\\d+)?)?(?:\\s?%|\\s?(?:${UNITS})(?![\\w]))?|(?:${NUMW})(?:\\s?(?:-|–|to)\\s?(?:${NUMW}))?\\s(?:${UNITS})(?![\\w]))`,'i');
+function numCloze(t){
+  const wc=t.split(/\s+/).length; if(wc<5||wc>45)return null;
+  const m=t.match(NUM_RE); if(!m)return null;
+  const after=t.slice(m.index+m[0].length,m.index+m[0].length+2);
+  if(/^[,.]?\d|^-|^[A-Za-z]/.test(after))return null;
+  return{front:t.slice(0,m.index)+'_____'+t.slice(m.index+m[0].length),back:m[0]};
+}
+function conceptsOf(text,extra){
+  const map=new Map();
+  const add=(term,w)=>{term=clean(term).replace(/[.:;,]+$/,'').trim();if(term.length<2||term.split(/\s+/).length>6)return;const k=term.toLowerCase();if(GENERIC.has(k))return;const o=map.get(k)||{term,w:0};o.w=Math.max(o.w,w);map.set(k,o)};
+  segment(text).forEach(g=>{const d=defPattern(g.text);if(d){if(!GENERIC.has(d.term.toLowerCase().split(/\s+/)[0]))add(d.term,3);return}const c=copula(g.text);if(c&&c.kind==='def'&&!c.generic)add(c.term.replace(/^(?:the|a|an)\s+/i,''),3);else if(c&&c.kind==='named')add(c.term,3)});
+  for(const m of text.matchAll(/\(([A-Z][A-Za-z0-9-]{1,7})\)/g))if(/^[A-Z]{2,}|[A-Z].*[A-Z]/.test(m[1]))add(m[1],2);
+  for(const m of text.matchAll(/\*\*([^*\n]{2,60})\*\*/g))add(m[1],2);
+  for(const m of text.matchAll(/^#{2,6}\s+(.+)$/gm))add(m[1],1);
+  (extra||[]).forEach(c=>c&&add(typeof c==='string'?c:c.term||'',2));
+  return[...map.values()].map(o=>({...o,n:(text.match(new RegExp(`(?<![\\w-])${escRe(o.term)}(?![\\w-])`,'gi'))||[]).length})).sort((a,b)=>b.w-a.w||b.n-a.n);
+}
+const conceptCache=new Map();
+function conceptsFor(src){
+  const k=src.id+':'+src.text.length+':'+(src.aiConcepts||[]).length;
+  if(!conceptCache.has(k))conceptCache.set(k,conceptsOf(src.text,src.aiConcepts));
+  return conceptCache.get(k);
+}
+function spread(a,k){if(k>=a.length)return a.slice();if(k<=0)return[];if(k===1)return[a[Math.floor(a.length/2)]];const out=[];for(let i=0;i<k;i++)out.push(a[Math.round(i*(a.length-1)/(k-1))]);return out}
+function mcqFrom(d,defs){
+  const others=defs.filter(o=>o.term.toLowerCase()!==d.term.toLowerCase());
+  const pool=[...shuffle(others.filter(o=>o.heading===d.heading)),...shuffle(others.filter(o=>o.heading!==d.heading))];
+  const picks=[]; for(const o of pool){if(picks.length>=3)break;if(!picks.some(p=>p.toLowerCase()===o.term.toLowerCase()))picks.push(o.term)}
+  if(picks.length<3)return null;
+  const options=shuffle([d.term,...picks]);
+  return{type:'mcq',front:'Which term matches this description?\n'+cap(d.def),back:d.term,options,answer:options.indexOf(d.term),concept:d.term};
+}
+function extract(src,{max,types,skip}){
+  const segs=segment(src.text), by={def:[],func:[],enumr:[],num:[],key:[]}, defs=[], used=new Set();
+  const ok=c=>!skip.has(fkey(c.front));
+  segs.forEach((g,i)=>{
+    const t=g.text; if(t.split(/\s+/).length<3)return;
+    const base={anchor:{start:g.start,end:g.end},quote:g.raw,heading:g.heading,pos:g.start};
+    const d=defPattern(t);
+    if(d){
+      const gen=GENERIC.has(d.term.toLowerCase().split(/\s+/)[0]);
+      const front=gen?`${cap(d.term)} for ${lcFirst(g.heading||src.title)}?`:`What ${isPlural(d.term)?'are':'is'} ${lcFirst(d.term)}?`;
+      by.def.push({...base,type:'qa',front,back:cap(d.def),concept:gen?(g.heading||d.term):d.term});
+      if(!gen)defs.push({term:d.term,def:d.def,heading:g.heading,base});
+      used.add(i);return;
+    }
+    const e=enumPattern(t);
+    if(e){by.enumr.push({...base,type:'qa',front:e.front,back:e.back,concept:e.subj});used.add(i);return}
+    const c=copula(t);
+    if(c){
+      if(c.kind==='named')by.def.push({...base,type:'qa',front:`What ${isPlural(c.subj)?'are':'is'} ${lcFirst(c.subj)} called?`,back:cap(c.term),concept:c.term});
+      else if(c.generic)by.def.push({...base,type:'qa',front:`What ${isPlural(c.subjCore)?'are':'is'} the ${lcFirst(c.subjCore)}?`,back:cap(c.def),concept:c.subjCore});
+      else{by.def.push({...base,type:'qa',front:`What ${isPlural(c.term)?'are':'is'} ${lcFirst(c.term)}?`,back:cap(c.def),concept:c.term});defs.push({term:c.term.replace(/^(?:the|a|an)\s+/i,''),def:c.def,heading:g.heading,base})}
+      used.add(i);return;
+    }
+    const f=funcPattern(t);
+    if(f){by.func.push({...base,type:'qa',front:f.front,back:f.back,concept:f.subj.replace(/^(?:the|a|an)\s+/i,'')});used.add(i);return}
+    const n=numCloze(t);
+    if(n){by.num.push({...base,type:'cloze',front:n.front,back:n.back,concept:g.heading||''});used.add(i)}
+  });
+  defs.forEach(d=>{d.term=cap(d.term)});
+  const concepts=conceptsOf(src.text,src.aiConcepts);
+  const keyTerms=concepts.filter(c=>c.w>=2&&c.term.length>=3).map(c=>c.term).sort((a,b)=>b.length-a.length);
+  segs.forEach((g,i)=>{
+    if(used.has(i))return; const t=g.text, wc=t.split(/\s+/).length; if(wc<6||wc>40)return;
+    for(const term of keyTerms){
+      const m=t.match(new RegExp(`(?<![\\w-])${escRe(term)}(?![\\w-])`,'i'));
+      if(m){by.key.push({anchor:{start:g.start,end:g.end},quote:g.raw,heading:g.heading,pos:g.start,type:'cloze',front:t.slice(0,m.index)+'_____'+t.slice(m.index+m[0].length),back:m[0],concept:term});break}
+    }
+  });
+  if(!types.qa){by.def=[];by.enumr=[];by.func=[]}
+  if(!types.cloze){by.num=[];by.key=[]}
+  const kinds=['def','func','enumr','num','key'].map(k=>by[k].filter(ok)).filter(a=>a.length);
+  const mcqs=types.mcq&&defs.length>=4?defs.map(d=>{const q=mcqFrom(d,defs);return q&&{...d.base,...q}}).filter(q=>q&&ok(q)):[];
+  const nonTotal=kinds.reduce((s,a)=>s+a.length,0);
+  let mq=Math.min(mcqs.length,nonTotal?Math.round(max*0.3):max);
+  const counts=kinds.map(()=>0); let left=Math.min(max-mq,nonTotal);
+  while(left>0){let moved=false;kinds.forEach((a,i)=>{if(left>0&&counts[i]<a.length){counts[i]++;left--;moved=true}});if(!moved)break}
+  const usedNon=counts.reduce((a,b)=>a+b,0); mq=Math.min(mcqs.length,max-usedNon);
+  const out=[]; kinds.forEach((a,i)=>out.push(...spread(a,counts[i]))); out.push(...spread(mcqs,mq));
+  out.sort((a,b)=>a.pos-b.pos||(a.type==='mcq')-(b.type==='mcq'));
+  return{cards:out.map(c=>({...c,trace:'exact'})),concepts};
+}
+
+/* ---------- AI drafting ---------- */
+const SYS=`You turn a student's own notes into study cards for a review queue. A person will check every card against the sentence it came from, so traceability matters more than coverage.
+
+Rules:
+- Use only facts stated in the notes. Do not add outside knowledge, even if you are sure it is true.
+- For every card, copy the single sentence (or bullet line) it is based on into source_quote exactly as it appears in the notes: same words, same punctuation, no ellipses, no paraphrase.
+- One idea per card. Keep fronts short and specific. Keep backs to one or two sentences.
+- Card types: "flashcard" (front is a question, back is the answer); "cloze" (front is the source sentence with the key term replaced by _____, back is the missing term); "mcq" (front is a question, options has exactly 4 plausible choices drawn from the notes, answer_index is the 0-based index of the correct option, back repeats the correct option).
+- For flashcard and cloze cards, set options to [] and answer_index to -1.
+- concept names the key term the card tests.
+- Also list the key concepts in the notes, each with a one-line reason it matters, taken from the notes.`;
+const SHAPE=`Reply with only a JSON object (no prose, no code fences) in exactly this shape:
+{"concepts":[{"term":"...","why":"..."}],"cards":[{"type":"flashcard","front":"...","back":"...","options":[],"answer_index":-1,"concept":"...","source_quote":"exact sentence copied from the notes"}]}`;
+const SCHEMA={type:'object',properties:{concepts:{type:'array',items:{type:'object',properties:{term:{type:'string'},why:{type:'string'}},required:['term','why'],additionalProperties:false}},cards:{type:'array',items:{type:'object',properties:{type:{type:'string',enum:['flashcard','cloze','mcq']},front:{type:'string'},back:{type:'string'},options:{type:'array',items:{type:'string'}},answer_index:{type:'integer'},concept:{type:'string'},source_quote:{type:'string'}},required:['type','front','back','options','answer_index','concept','source_quote'],additionalProperties:false}}},required:['concepts','cards'],additionalProperties:false};
+function typeList(types){return[types.qa&&'flashcard',types.cloze&&'cloze',types.mcq&&'mcq'].filter(Boolean).join(', ')}
+function userPrompt(title,text,n,types){return`Write up to ${n} cards using these types: ${typeList(types)}. Favor definitions, distinctions between similar terms, numbers and lists a student would be tested on. Skip anything trivial.\n\nNotes titled "${title}":\n<notes>\n${text}\n</notes>`}
+function chunkText(text,size){
+  if(text.length<=size)return[text];
+  const parts=text.split(/\n\s*\n/), out=[]; let cur='';
+  for(const p of parts){if(cur&&cur.length+p.length+2>size){out.push(cur);cur=''}cur+=(cur?'\n\n':'')+p}
+  if(cur)out.push(cur);
+  return out.flatMap(c=>{if(c.length<=size)return[c];const r=[];for(let i=0;i<c.length;i+=size)r.push(c.slice(i,i+size));return r});
+}
+async function fetchJSON(url,opts,ms=180000){
+  const ac=new AbortController(), t=setTimeout(()=>ac.abort(),ms);
+  let r; try{r=await fetch(url,{...opts,signal:ac.signal})}catch(e){clearTimeout(t);throw new Error(e.name==='AbortError'?'The request timed out. Try a shorter note or fewer cards.':'Couldn’t reach the provider. Check your connection.')}
+  clearTimeout(t);
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){
+    const msg=(j.error&&(j.error.message||j.error))||('HTTP '+r.status);
+    if(r.status===401||r.status===403)throw new Error('The provider rejected that API key. ('+msg+')');
+    if(r.status===429)throw new Error('Rate limited. Wait a minute and try again. ('+msg+')');
+    throw new Error(String(msg));
+  }
+  return j;
+}
+async function callAI(eng,key,model,user){
+  if(eng==='claude'){
+    const body={model,max_tokens:16000,system:SYS,messages:[{role:'user',content:user}],output_config:{effort:'medium',format:{type:'json_schema',schema:SCHEMA}}};
+    const headers={'content-type':'application/json','x-api-key':key,'anthropic-version':'2026-10-21','anthropic-dangerous-direct-browser-access':'true'};
+    if(/^claude-(opus-5(-5)?|sonnet-5-5|fable-5-1)$/.test(model)){body.fallbacks='default';headers['anthropic-beta']='server-side-fallback-2026-07-01'}
+    const j=await fetchJSON('https://api.anthropic.com/v1/messages',{method:'POST',headers,body:JSON.stringify(body)});
+    if(j.stop_reason==='refusal')throw new Error('The model declined this request.');
+    return(j.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+  }
+  if(eng==='gemini'){
+    const j=await fetchJSON(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({systemInstruction:{parts:[{text:SYS}]},contents:[{role:'user',parts:[{text:user+'\n\n'+SHAPE}]}],generationConfig:{responseMimeType:'application/json'}})});
+    const c=j.candidates&&j.candidates[0];
+    if(!c)throw new Error('Gemini returned no answer'+(j.promptFeedback&&j.promptFeedback.blockReason?' ('+j.promptFeedback.blockReason+')':'')+'.');
+    return(c.content&&c.content.parts||[]).map(p=>p.text||'').join('');
+  }
+  if(eng==='openai'){
+    const j=await fetchJSON('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+key},body:JSON.stringify({model,messages:[{role:'system',content:SYS+'\n\n'+SHAPE},{role:'user',content:user}],response_format:{type:'json_object'}})});
+    return j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content||'';
+  }
+  throw new Error('Unknown engine');
+}
+function parseAI(txt){
+  let s=String(txt||'').trim().replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'');
+  const a=s.indexOf('{'), b=s.lastIndexOf('}'); let j;
+  if(a<0||b<a){if(s.trim().startsWith('['))try{j={cards:JSON.parse(s)}}catch{} if(!j)throw new Error('Couldn’t find JSON in that reply. Ask for JSON only and try again.')}
+  else{try{j=JSON.parse(s.slice(a,b+1))}catch{throw new Error('That reply isn’t valid JSON (it may have been cut off). Try fewer cards or ask for JSON only.')}}
+  const raw=Array.isArray(j)?j:Array.isArray(j.cards)?j.cards:[];
+  const cards=raw.map(normAI).filter(Boolean);
+  if(!cards.length)throw new Error('No usable cards in that reply.');
+  return{cards,concepts:Array.isArray(j.concepts)?j.concepts.filter(c=>c&&c.term):[]};
+}
+function normAI(c){
+  if(!c||typeof c!=='object')return null;
+  const t=String(c.type||'').toLowerCase();
+  let type=/mc|multiple|choice/.test(t)?'mcq':/cloze|blank|fill/.test(t)?'cloze':'qa';
+  const front=String(c.front||c.question||'').trim(); let back=String(c.back||c.answer||'').trim();
+  let options=Array.isArray(c.options)?c.options.map(o=>String(o).trim()).filter(Boolean):[];
+  let answer=Number.isInteger(c.answer_index)?c.answer_index:-1;
+  if(type==='mcq'){
+    if(answer<0||answer>=options.length)answer=options.findIndex(o=>fkey(o)===fkey(back));
+    if(options.length<2||answer<0){type='qa';options=[];answer=-1}else back=options[answer];
+  }
+  if(!front||!back)return null;
+  return{type,front,back,options,answer,concept:String(c.concept||'').trim(),source_quote:String(c.source_quote||c.quote||'').trim()};
+}
+function normMap(s){
+  let n='',sp=true; const map=[];
+  for(let i=0;i<s.length;i++){
+    let ch=s[i]; if('*_`#'.includes(ch))continue;
+    if(ch==='‘'||ch==='’')ch="'";else if(ch==='“'||ch==='”')ch='"';else if(ch==='–'||ch==='—')ch='-';
+    if(/\s/.test(ch)){if(sp)continue;ch=' ';sp=true}else sp=false;
+    n+=ch.toLowerCase(); map.push(i);
+  }
+  return{n,map};
+}
+function locate(src,quote){
+  const q=normMap(String(quote||'')).n.replace(/^[-•*\d.)\s]+/,'').replace(/[\s.;:,!?]+$/,'').trim();
+  if(q.length>=8){
+    const N=normMap(src.text), i=N.n.indexOf(q);
+    if(i>=0)return{trace:'exact',anchor:{start:N.map[i],end:N.map[i+q.length-1]+1}};
+  }
+  const segs=segment(src.text), qt=toks(q); if(!qt.size||!segs.length)return{trace:'missing',anchor:null};
+  let best=null,bs=0;
+  for(let i=0;i<segs.length;i++)for(const j of[i,i+1]){
+    if(j>=segs.length)continue;
+    const st=toks(segs.slice(i,j+1).map(s=>s.text).join(' ')); if(!st.size)continue;
+    let inter=0; qt.forEach(w=>{if(st.has(w))inter++});
+    const r=inter/qt.size, p=inter/st.size, f=r+p?2*r*p/(r+p):0;
+    if(f>bs+1e-9){bs=f;best={start:segs[i].start,end:segs[j].end}}
+  }
+  if(bs>=0.6)return{trace:'close',anchor:best};
+  return{trace:'missing',anchor:bs>=0.25?best:null};
+}
+function anchorAI(src,c){const L=locate(src,c.source_quote);return{...c,anchor:L.anchor,trace:L.trace,aiQuote:c.source_quote,quote:L.anchor?src.text.slice(L.anchor.start,L.anchor.end):c.source_quote}}
+function addDrafts(src,list,engine){
+  const seen=new Set(S.cards.filter(c=>c.src===src.id).map(c=>fkey(c.front))), added=[];
+  for(const c of list){
+    const k=fkey(c.front); if(!k||seen.has(k))continue; seen.add(k);
+    const card={id:uid(),src:src.id,type:c.type,front:c.front,back:c.back||'',options:(c.options||[]).slice(),answer:c.type==='mcq'?c.answer:-1,concept:c.concept||'',quote:c.quote||'',aiQuote:engine==='builtin'?'':(c.aiQuote||''),a:c.anchor?[c.anchor.start,c.anchor.end]:null,trace:c.trace||'exact',engine,status:'queue',created:Date.now()};
+    card.orig={front:card.front,back:card.back,options:card.options.slice(),answer:card.answer,concept:card.concept};
+    S.cards.push(card); added.push(card);
+  }
+  save(); return added;
+}
+function addSource(title,text){const s={id:uid(),title:title.trim()||'Untitled note',text:text.replace(/\r\n?/g,'\n'),created:Date.now()};S.sources.push(s);save();return s}
+
+async function generate(){
+  const src=srcById(U.sel); if(!src||U.gen.busy)return;
+  const st=S.settings, eng=st.engine, types=st.types;
+  if(!types.qa&&!types.cloze&&!types.mcq)return toast('Pick at least one card type.');
+  const skip=new Set(S.cards.filter(c=>c.src===src.id).map(c=>fkey(c.front)));
+  if(eng==='builtin'){
+    const res=extract(src,{max:st.max,types,skip});
+    const added=addDrafts(src,res.cards,'builtin');
+    afterDraft(src,added);return;
+  }
+  const key=getKey(eng);
+  if(!key){toast(`Add your ${PROV[eng].vendor} API key first.`);$('#apiKey')&&$('#apiKey').focus();return}
+  U.gen={busy:true,msg:`Sending “${trunc(src.title,40)}” to ${PROV[eng].vendor}…`,err:''}; render();
+  try{
+    const chunks=chunkText(src.text,40000), all=[], concepts=[];
+    for(let i=0;i<chunks.length;i++){
+      if(chunks.length>1){U.gen.msg=`Part ${i+1} of ${chunks.length}: waiting for ${PROV[eng].vendor}…`;updateStatus()}
+      const n=Math.max(3,Math.round(st.max*chunks[i].length/src.text.length));
+      const out=parseAI(await callAI(eng,key,st.models[eng],userPrompt(src.title,chunks[i],n,types)));
+      all.push(...out.cards); concepts.push(...out.concepts);
+    }
+    src.aiConcepts=concepts.slice(0,40).map(c=>({term:String(c.term),why:String(c.why||'')}));
+    const added=addDrafts(src,all.map(c=>anchorAI(src,c)),eng);
+    U.gen={busy:false,msg:'',err:''}; afterDraft(src,added);
+  }catch(e){U.gen={busy:false,msg:'',err:e.message||String(e)};render()}
+}
+function afterDraft(src,added){
+  if(!added.length){U.gen.msg='No new cards: everything this engine found is already in your queue or library.';render();return}
+  const miss=added.filter(c=>c.trace!=='exact').length;
+  U.gen.msg=`${plural(added.length,'draft')} added to the review queue${miss?` (${miss} flagged for a closer look)`:''}.`;
+  U.r.src='';U.r.idx=Math.max(0,queue().findIndex(c=>c.id===added[0].id));
+  render(); toast(`${plural(added.length,'draft')} ready to review`,'Review now',()=>go('review'));
+}
+function updateStatus(){const el=$('#genStatus');if(el)el.textContent=U.gen.msg}
+function pastePrompt(src){const types=S.settings.types;return SYS+'\n\n'+SHAPE+'\n\n'+userPrompt(src.title,src.text,S.settings.max,types)}
+
+/* ---------- derived data ---------- */
+function queue(){
+  const order=new Map(S.sources.map((s,i)=>[s.id,i]));
+  return S.cards.filter(c=>c.status==='queue'&&(!U.r.src||c.src===U.r.src)).sort((a,b)=>(order.get(a.src)??99)-(order.get(b.src)??99)||((a.a?a.a[0]:1e9)-(b.a?b.a[0]:1e9))||(a.type==='mcq')-(b.type==='mcq')||a.created-b.created);
+}
+const libCards=()=>S.cards.filter(c=>c.status==='library');
+const dueCards=()=>libCards().filter(c=>(c.due||0)<=Date.now());
+function countsFor(id){let queue=0,lib=0;S.cards.forEach(c=>{if(c.src!==id)return;if(c.status==='queue')queue++;else if(c.status==='library')lib++});return{queue,lib}}
+function isEdited(c){const o=c.orig||{};return c.front!==o.front||c.back!==o.back||c.answer!==o.answer||JSON.stringify(c.options||[])!==JSON.stringify(o.options||[])}
+function context(src,a){
+  const t=src.text; if(!a)return null;
+  let s=t.lastIndexOf('\n\n',a[0]); s=s<0?0:s+2;
+  let e=t.indexOf('\n\n',a[1]); e=e<0?t.length:e;
+  if(a[0]-s>650){const k=t.lastIndexOf('\n',a[0]-320);s=k<s?Math.max(s,a[0]-320):k+1}
+  if(e-a[1]>650){const k=t.indexOf('\n',a[1]+320);e=k<0||k>e?Math.min(e,a[1]+320):k}
+  let heading=''; const before=t.slice(0,a[0]).split('\n');
+  for(let i=before.length-1;i>=0;i--){const m=before[i].match(/^\s*#{1,6}\s+(.+)$/);if(m){heading=clean(m[1]);break}}
+  return{before:t.slice(s,a[0]),hit:t.slice(a[0],a[1]),after:t.slice(a[1],e),heading};
+}
+function unsupported(c,ctx){
+  const have=toks(ctx), ans=c.type==='mcq'?(c.options[c.answer]||c.back):c.back, out=[];
+  (String(ans).toLowerCase().match(/[a-z0-9]+(?:-[a-z0-9]+)*/g)||[]).forEach(w=>{if(w.length<4||STOP.has(w))return;if(!have.has(stem(w))&&!out.includes(w))out.push(w)});
+  return out.slice(0,5);
+}
+function quoteOf(c){const s=srcById(c.src);return c.a&&s?s.text.slice(c.a[0],c.a[1]):c.quote}
+function streak(){let n=0,t=Date.now();if(!S.days[dkey(t)])t-=DAY;while(S.days[dkey(t)]){n++;t-=DAY}return n}
+function stats(){
+  const cs=S.cards, r={total:cs.length,queue:0,lib:0,asis:0,edited:0,disc:0,exact:0,close:0,missing:0,missCaught:0,missKept:0,reasons:{},eng:{},type:{}};
+  cs.forEach(c=>{
+    r[c.trace]=(r[c.trace]||0)+1;
+    const E=r.eng[c.engine]||(r.eng[c.engine]={n:0,asis:0,edited:0,disc:0,q:0}), T=r.type[c.type]||(r.type[c.type]={n:0,asis:0,edited:0,disc:0,q:0});
+    E.n++;T.n++;
+    if(c.status==='queue'){r.queue++;E.q++;T.q++}
+    else if(c.status==='library'){r.lib++;if(c.edited){r.edited++;E.edited++;T.edited++}else{r.asis++;E.asis++;T.asis++}if(c.trace==='missing'){if(c.edited)r.missCaught++;else r.missKept++}}
+    else if(c.status==='discarded'){r.disc++;E.disc++;T.disc++;const k=c.why||'No reason given';r.reasons[k]=(r.reasons[k]||0)+1;if(c.trace==='missing')r.missCaught++}
+  });
+  r.reviewed=r.asis+r.edited+r.disc;
+  const days=Object.entries(S.days); r.studied=days.reduce((s,[,d])=>s+d.n,0);
+  const wk=days.filter(([k])=>Date.parse(k)>=Date.now()-7*DAY); r.wkN=wk.reduce((s,[,d])=>s+d.n,0); r.wkOk=wk.reduce((s,[,d])=>s+d.ok,0);
+  r.mastered=libCards().filter(c=>(c.box||0)>=4).length; r.due=dueCards().length; r.streak=streak();
+  return r;
+}
+
+/* ---------- rendering ---------- */
+const VIEWS={};
+function setBadge(sel,n){const b=$(sel);b.hidden=!n;b.textContent=n>99?'99+':n}
+function render(){
+  if(!S||!U)return;
+  $$('.tabs [data-tab]').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.tab===U.tab)));
+  setBadge('#bQueue',S.cards.filter(c=>c.status==='queue').length);
+  setBadge('#bDue',dueCards().length);
+  $('#lockBtn').hidden=!cryptoKey; $('#demoBar').hidden=!DEMO;
+  $('#view').innerHTML=VIEWS[U.tab]();
+  afterRender();
+}
+function afterRender(){
+  if(U.tab==='notes'&&U.focusA!=null){
+    const el=$(`#noteText [data-s="${U.focusA}"]`);
+    if(el){el.scrollIntoView({block:'center',behavior:'smooth'});el.classList.add('flashmark')}
+    U.focusA=null;
+  }
+  if(U.tab==='review'){const m=$('#excerpt mark');if(m){const box=$('#excerpt');box.scrollTop=Math.max(0,m.offsetTop-box.offsetTop-80)}}
+}
+
+/* notes */
+function phases(){
+  const st=stats(), q=st.queue;
+  const P=[
+    {t:'Pick your source',d:S.sources.length?plural(S.sources.length,'note')+' added':'Paste or upload notes',done:S.sources.length>0,go:'notes'},
+    {t:'Draft cards',d:st.total?plural(st.total,'draft')+' made':'Built-in or your own AI key',done:st.total>0,go:'notes'},
+    {t:'Check every card',d:st.total?(q?q+' waiting in review':'Queue clear'):'Approve, edit or discard',done:st.total>0&&q===0,go:'review'},
+    {t:'Study',d:st.studied?plural(st.studied,'answer')+' logged':'Flashcards and quizzes',done:st.studied>0,go:'study'},
+    {t:'Lock it',d:cryptoKey?'Passphrase on':'Passphrase lock',done:!!cryptoKey,go:'lock'}
+  ];
+  const now=P.find(p=>!p.done);
+  return `<ol class="phases" aria-label="Steps">${P.map((p,i)=>`<li><button class="phase${p.done?' done':''}${p===now?' now':''}" data-act="phase" data-go="${p.go}"><span class="n">${p.done?'✓':i+1}</span><span><b>${p.t}</b><small>${esc(p.d)}</small></span></button></li>`).join('')}</ol>`;
+}
+VIEWS.notes=()=>{
+  const sel=srcById(U.sel)||S.sources[S.sources.length-1]; U.sel=sel?sel.id:null;
+  return phases()+`<div class="split"><div class="stack">${addNoteHTML()}${srcListHTML(sel)}</div><div class="stack">${sel?genHTML(sel)+viewerHTML(sel):introHTML()}</div></div>`;
+};
+function addNoteHTML(){
+  return `<section class="card"><h2><span class="step">1</span>Add notes<span class="sub">Yours, or material you’re allowed to use</span></h2>
+  <label>Title<input type="text" id="nTitle" maxlength="120" value="${esc(U.draft.title)}" placeholder="e.g. Endo lecture 4"></label>
+  <label>Notes<textarea id="nText" rows="8" placeholder="Paste lecture notes, a transcript or an outline. Headings and bullet points help the built-in drafter.">${esc(U.draft.text)}</textarea></label>
+  <div class="btnrow"><button class="btn primary" data-act="saveNote">Save note</button>
+  <label class="btn" tabindex="0" id="uploadLbl" style="margin:0">Upload file<input type="file" id="nFile" accept=".txt,.md,.markdown,.pdf,.docx,text/plain,text/markdown,application/pdf" hidden></label>
+  <button class="btn ghost" data-act="sample">Use sample notes</button></div>
+  <p class="hint" id="nMsg">${esc(U.nMsg||'.txt, .md, .pdf or .docx. File text lands here first so you can trim it before saving.')}</p></section>`;
+}
+function srcListHTML(sel){
+  if(!S.sources.length)return `<section class="card"><h2>Your notes</h2><p class="empty">No notes yet.</p></section>`;
+  return `<section class="card"><h2>Your notes<span class="sub">${S.sources.length}</span></h2><ul class="srclist">${S.sources.map(s=>{const c=countsFor(s.id);return `<li class="${sel&&s.id===sel.id?'on':''}"><button class="srcbtn" data-act="pickNote" data-id="${s.id}"><b>${esc(s.title)}</b><small>${words(s.text).toLocaleString()} words · ${c.queue} to review · ${c.lib} in library</small></button><button class="icon" data-act="delNote" data-id="${s.id}" aria-label="Delete ${esc(s.title)}" title="Delete note">×</button></li>`}).join('')}</ul></section>`;
+}
+function introHTML(){
+  return `<section class="card"><h2>How it works</h2>
+  <h2 class="title">Your notes in, checked cards out.</h2>
+  <p class="muted" style="margin:0">Add notes and the app drafts flashcards and quiz questions from them. Every draft waits in a review queue next to the sentence it came from. You approve, fix or toss it, and only approved cards reach your library.</p>
+  <div class="howto"><div><b>1 · Draft</b>Built-in pattern finder, or your own Claude, Gemini or OpenAI key.</div><div><b>2 · Check</b>Card on one side, your sentence on the other. Unbacked drafts get flagged.</div><div><b>3 · Study</b>Searchable library, flashcards, quizzes and spaced review.</div></div>
+  <div class="btnrow"><button class="btn primary" data-act="sample">Try it with sample notes</button><a class="btn ghost" href="?demo=review">See a finished demo</a></div></section>`;
+}
+function genHTML(src){
+  const st=S.settings, e=st.engine, P=PROV[e], g=U.gen;
+  const engs=Object.entries(PROV).map(([k,p])=>`<button class="eng" role="radio" aria-checked="${k===e}" data-act="engine" data-k="${k}"><b>${p.name}</b><small>${p.tag}</small></button>`).join('');
+  let cfg='';
+  if(e==='builtin')cfg=`<p class="note-ok">Runs in your browser and looks for definitions, lists, numbers and key terms. Nothing leaves this page. Expect a few clumsy drafts. That’s what the review queue is for.</p>`;
+  else if(e==='paste')cfg=`<ol class="pastesteps"><li><button class="btn sm" data-act="copyPrompt">Copy prompt</button> <span class="muted">It includes this note and the rules.</span></li><li>Paste it into Gemini, ChatGPT, Claude or another chatbot.</li><li>Paste the JSON reply here:<textarea id="pasteBox" rows="5" placeholder='{"concepts":[…],"cards":[…]}'>${esc(U.paste)}</textarea></li></ol>`;
+  else cfg=`<div class="keyrow"><label>${P.vendor} API key<input type="password" id="apiKey" data-p="${e}" autocomplete="off" spellcheck="false" value="${esc(getKey(e))}" placeholder="${P.ph}"></label><label>Model<input type="text" id="apiModel" data-p="${e}" list="models-${e}" value="${esc(st.models[e])}" spellcheck="false"><datalist id="models-${e}">${P.models.map(m=>`<option value="${m}">`).join('')}</datalist></label></div>
+  <label class="check"><input type="checkbox" id="remember" ${st.remember?'checked':''}> Remember keys on this device ${cryptoKey?'(encrypted by your lock)':'(unencrypted until you turn on the lock)'}</label>
+  <p class="hint" style="margin-top:0">Get a key at <a href="${P.keyUrl}" target="_blank" rel="noopener">${P.keyHost}</a>. When you draft, this note (${words(src.text).toLocaleString()} words) goes from your browser straight to ${P.vendor}. Nothing else sees it.</p>`;
+  const types=`<fieldset class="types"><legend>Card types</legend>${[['qa','Flashcards'],['cloze','Fill-in-the-blank'],['mcq','Multiple choice']].map(([k,l])=>`<label class="check"><input type="checkbox" data-type="${k}" ${st.types[k]?'checked':''}> ${l}</label>`).join('')}</fieldset>`;
+  const btn=e==='paste'?`<button class="btn primary wide" data-act="importReply">Import reply → review queue</button>`:`<button class="btn primary wide" data-act="generate" ${g.busy?'disabled':''}>${g.busy?'Drafting…':'Draft cards → review queue'}</button>`;
+  return `<section class="card"><h2><span class="step">2</span>Draft cards<span class="sub">from “${esc(trunc(src.title,42))}”</span></h2>
+  <div class="engines" role="radiogroup" aria-label="Drafting engine">${engs}</div>${cfg}
+  <div class="genopts"><label class="range">Up to <output id="maxOut">${st.max}</output> cards<input type="range" id="gMax" min="5" max="40" value="${st.max}"></label>${types}</div>
+  ${btn}<p class="status" id="genStatus" role="status">${esc(g.msg)}</p>${g.err?`<p class="alert bad">${esc(g.err)}</p>`:''}</section>`;
+}
+const md=s=>esc(s).replace(/^(#{1,6})\s+(.*)$/gm,(m,a,b)=>`<b class="mdh">${b}</b>`).replace(/^([ \t]*)[-*•]\s+/gm,'$1• ');
+function coverageHTML(src){
+  const t=src.text, rs=new Map();
+  S.cards.forEach(c=>{if(c.src!==src.id||!c.a||(c.status!=='queue'&&c.status!=='library'))return;const k=c.a[0]+':'+c.a[1];const cur=rs.get(k);if(!cur||c.status==='library')rs.set(k,{s:c.a[0],e:c.a[1],st:c.status})});
+  const list=[...rs.values()].sort((a,b)=>a.s-b.s||b.e-a.e); let out='',cur=0;
+  for(const r of list){if(r.s<cur)continue;out+=md(t.slice(cur,r.s))+`<span class="cov ${r.st==='library'?'lib':'q'}" data-s="${r.s}">${esc(t.slice(r.s,r.e))}</span>`;cur=r.e}
+  return out+md(t.slice(cur));
+}
+function viewerHTML(src){
+  const con=conceptsFor(src).filter(c=>c.n>0&&(c.w>1||c.n>1)).slice(0,14), segs=segment(src.text);
+  const covered=segs.filter(g=>S.cards.some(c=>c.src===src.id&&c.a&&(c.status==='queue'||c.status==='library')&&c.a[0]<g.end&&c.a[1]>g.start)).length;
+  return `<section class="card"><h2>${esc(trunc(src.title,48))}<span class="sub legend"><i class="sw lib"></i>In library<i class="sw q"></i>In review</span></h2>
+  ${con.length?`<div class="concepts"><span class="eyebrow">Key concepts</span>${con.map(c=>`<button class="chip" data-act="concept" data-term="${esc(c.term)}" title="Find cards about ${esc(c.term)}">${esc(c.term)}${c.n>1?`<small>${c.n}</small>`:''}</button>`).join('')}</div>`:''}
+  <div class="notetext" id="noteText">${coverageHTML(src)}</div>
+  <p class="hint">${covered} of ${plural(segs.length,'sentence')} ${covered===1?'has':'have'} a card. Underlined text has one; plain text doesn’t yet.</p></section>`;
+}
+
+/* review */
+function srcFilterHTML(id,val,label){return S.sources.length>1?`<select id="${id}" aria-label="${label}"><option value="">All notes</option>${S.sources.map(s=>`<option value="${s.id}" ${val===s.id?'selected':''}>${esc(trunc(s.title,34))}</option>`).join('')}</select>`:''}
+VIEWS.review=()=>{
+  const q=queue();
+  if(!q.length){
+    const st=stats();
+    if(U.r.src&&S.cards.some(c=>c.status==='queue')){U.r.src='';return VIEWS.review()}
+    return `<div class="emptybig"><h2 class="title">${st.total?'Queue clear':'Nothing to review yet'}</h2><p>${st.total?`You’ve checked all ${st.total} drafts: ${st.asis} approved as written, ${st.edited} fixed, ${st.disc} discarded.`:'Add a note and draft some cards. They’ll wait here until you check them.'}</p><div class="btnrow">${st.lib?'<button class="btn primary" data-act="goto" data-go="study">Study your cards</button>':''}<button class="btn" data-act="goto" data-go="notes">${st.total?'Draft more':'Add notes'}</button></div></div>`;
+  }
+  U.r.idx=Math.max(0,Math.min(U.r.idx,q.length-1));
+  const c=q[U.r.idx], src=srcById(c.src); U.r.cur=c.id;
+  return `<div class="rvhead"><div><h2 class="title">Review queue</h2><p class="muted">Check each draft against the sentence it came from. Only approved cards reach your library.</p></div>
+  <div class="rvtools">${srcFilterHTML('rvSrc',U.r.src,'Filter by note')}<span class="count">${U.r.idx+1} / ${q.length}</span><button class="icon" data-act="prev" aria-label="Previous draft">‹</button><button class="icon" data-act="next" aria-label="Next draft">›</button></div></div>
+  <div class="rv">${srcPaneHTML(c,src)}${cardPaneHTML(c,src)}</div>
+  <p class="kbdhelp"><kbd>A</kbd> approve · <kbd>D</kbd> discard · <kbd>S</kbd> skip · <kbd>E</kbd> edit · <kbd>←</kbd><kbd>→</kbd> move · <kbd>Esc</kbd> stop editing</p>`;
+};
+function srcPaneHTML(c,src){
+  const T={exact:['ok','Exact sentence from your notes'],close:['warn','Close match: wording differs'],missing:['bad','Not found in your notes']}[c.trace]||['ok',''];
+  const ctx=src&&c.a?context(src,c.a):null;
+  const body=ctx?`<div class="crumb">${esc(src.title)}${ctx.heading?' › '+esc(ctx.heading):''}</div><div class="excerpt" id="excerpt">${md(ctx.before)}<mark class="hl">${esc(ctx.hit)}</mark>${md(ctx.after)}</div>`:`<div class="crumb">${esc(src?src.title:'Deleted note')}</div><p class="excerpt muted">No sentence in your notes matches this draft.</p>`;
+  let alert='';
+  if(c.trace==='close')alert=`<div class="alert warn"><b>The draft quoted:</b> “${esc(c.aiQuote||c.quote)}”<br>That isn’t word for word in your notes. The closest sentence is highlighted. Make sure they say the same thing.</div>`;
+  if(c.trace==='missing')alert=`<div class="alert bad"><b>The draft quoted:</b> “${esc(c.aiQuote||c.quote||'(nothing)')}”<br>That sentence isn’t in your notes${ctx?'; the nearest one is highlighted':''}. The card may contain facts you never wrote down.</div>`;
+  return `<section class="pane src" aria-label="Source"><div class="panehead"><span class="eyebrow">From your notes</span><span class="trace ${T[0]}">${T[1]}</span></div>${body}${alert}${src?`<button class="btn ghost sm" data-act="openNote" data-id="${src.id}" data-s="${c.a?c.a[0]:''}" style="margin-top:12px">Open whole note</button>`:''}</section>`;
+}
+function cardPaneHTML(c,src){
+  const ed=isEdited(c), ctx=src&&c.a?context(src,c.a):null;
+  const uns=c.trace!=='missing'&&ctx?unsupported(c,ctx.heading+' '+ctx.before+ctx.hit+ctx.after):[];
+  const opts=`<fieldset class="opts"><legend>Choices <span class="hint">· mark the correct one</span></legend>${c.options.map((o,i)=>`<div class="optrow"><input type="radio" name="ans" data-ans="${i}" ${i===c.answer?'checked':''} aria-label="Choice ${i+1} is correct"><input type="text" data-opt="${i}" value="${esc(o)}" aria-label="Choice ${i+1}"></div>`).join('')}</fieldset>`;
+  return `<section class="pane" aria-label="Draft card"><div class="panehead"><span class="eyebrow">Draft card</span><span class="chip">${TYPE_LABEL[c.type]}</span><span class="chip quiet">${esc((PROV[c.engine]||{}).name||c.engine)}</span><span class="chip edited" id="edBadge" ${ed?'':'hidden'}>Edited</span></div>
+  <label class="fl">${c.type==='cloze'?'Sentence with a blank':c.type==='mcq'?'Question':'Front'}<textarea data-f="front" rows="3" id="fFront">${esc(c.front)}</textarea></label>
+  ${c.type==='mcq'?opts:`<label class="fl">${c.type==='cloze'?'Missing word(s)':'Back'}<textarea data-f="back" rows="${c.type==='cloze'?1:3}">${esc(c.back)}</textarea></label>`}
+  <label class="fl">Concept<input type="text" data-f="concept" value="${esc(c.concept)}"></label>
+  ${uns.length?`<p class="alert warn sm">In the answer but not in this excerpt: ${uns.map(w=>`<b>${esc(w)}</b>`).join(', ')}. Check against your notes.</p>`:''}
+  <div id="rvActions" style="margin-top:14px">${U.r.discard?discardHTML():actionsHTML(c,ed)}</div></section>`;
+}
+function actionsHTML(c,ed){
+  if(c.trace==='missing'&&U.r.confirm)return `<div class="confirm"><p>Nothing in your notes backs this card. Approve it anyway?</p><div class="btnrow"><button class="btn warnbtn" data-act="approve" data-force="1">Yes, approve <kbd>Y</kbd></button><button class="btn" data-act="cancelConfirm">Cancel</button></div></div>`;
+  return `<div class="actions"><button class="btn primary" data-act="approve" id="approveBtn">${ed?'Save edits &amp; approve':'Approve'}<kbd>A</kbd></button><button class="btn" data-act="discard">Discard<kbd>D</kbd></button><button class="btn ghost" data-act="skip">Skip<kbd>S</kbd></button></div>`;
+}
+function discardHTML(){return `<div class="reasons"><p>Why discard it? <span class="hint">It feeds your progress report.</span></p><div class="chips">${REASONS.map((r,i)=>`<button class="chip btnchip" data-act="why" data-i="${i}"><kbd>${i+1}</kbd>${r}</button>`).join('')}<button class="chip btnchip" data-act="why" data-i="-1">No reason</button></div><button class="btn ghost sm" data-act="cancelDiscard">Cancel</button></div>`}
+function curCard(){return U.r.cur&&cardById(U.r.cur)}
+function approve(force){
+  const c=curCard(); if(!c)return;
+  if(c.trace==='missing'&&!force){U.r.confirm=true;render();return}
+  if(!c.front.trim()||(c.type!=='mcq'&&!c.back.trim()))return toast('Fill in both sides before approving.');
+  if(c.type==='mcq'){
+    c.options=c.options.map(o=>o.trim());
+    if(c.options.filter(Boolean).length<2||!c.options[c.answer])return toast('A multiple-choice card needs at least two choices and a correct one.');
+    c.back=c.options[c.answer];
+  }
+  c.front=c.front.trim(); c.back=c.back.trim();
+  Object.assign(c,{status:'library',edited:isEdited(c),reviewed:Date.now(),box:0,due:Date.now(),seen:0,right:0,lapses:0});
+  U.r.confirm=false; save();
+  toast(c.edited?'Approved with your edits':'Approved','Undo',()=>undoReview(c.id)); render();
+}
+function discard(i){
+  const c=curCard(); if(!c)return;
+  Object.assign(c,{status:'discarded',why:i>=0?REASONS[i]:'',reviewed:Date.now()});
+  U.r.discard=false; U.r.confirm=false; save();
+  toast('Discarded','Undo',()=>undoReview(c.id)); render();
+}
+function undoReview(id){
+  const c=cardById(id); if(!c)return;
+  c.status='queue'; delete c.why; delete c.edited; delete c.reviewed;
+  save(); U.r.src=''; U.r.idx=Math.max(0,queue().findIndex(x=>x.id===id)); go('review'); render();
+}
+function onCardField(el){
+  const c=curCard(); if(!c)return;
+  if(el.dataset.f)c[el.dataset.f]=el.value;
+  else if(el.dataset.opt!=null){c.options[+el.dataset.opt]=el.value;if(+el.dataset.opt===c.answer)c.back=el.value}
+  else if(el.dataset.ans!=null){c.answer=+el.dataset.ans;c.back=c.options[c.answer]}
+  save();
+  const ed=isEdited(c); const b=$('#edBadge'); if(b)b.hidden=!ed;
+  const ab=$('#approveBtn'); if(ab)ab.innerHTML=(ed?'Save edits &amp; approve':'Approve')+'<kbd>A</kbd>';
+}
+
+/* library */
+function matchQ(c,q){
+  if(!q)return true; const src=srcById(c.src);
+  const hay=[c.front,c.back,(c.options||[]).join(' '),c.concept,quoteOf(c),src?src.title:''].join(' ').toLowerCase();
+  return q.toLowerCase().split(/\s+/).filter(Boolean).every(w=>hay.includes(w));
+}
+function hl(s,q){
+  let out=esc(s); if(!q)return out;
+  const ws=[...new Set(q.toLowerCase().split(/\s+/).filter(w=>w.length>1&&!/^(amp|lt|gt|quot|mark|39)$/.test(w)))];
+  if(!ws.length)return out;
+  return out.replace(new RegExp('('+ws.map(w=>escRe(esc(w))).join('|')+')','gi'),'<mark class="q">$1</mark>');
+}
+function libList(){
+  const L=U.lib, all=libCards(), order=new Map(S.sources.map((s,i)=>[s.id,i]));
+  let list=all.filter(c=>(!L.src||c.src===L.src)&&(!L.type||c.type===L.type)&&matchQ(c,L.q));
+  const by={note:(a,b)=>(order.get(a.src)??99)-(order.get(b.src)??99)||((a.a?a.a[0]:0)-(b.a?b.a[0]:0)),new:(a,b)=>(b.reviewed||0)-(a.reviewed||0),weak:(a,b)=>(a.box||0)-(b.box||0)||(b.lapses||0)-(a.lapses||0),az:(a,b)=>a.front.localeCompare(b.front)};
+  list.sort(by[L.sort]||by.note);
+  return{list,all};
+}
+VIEWS.library=()=>{
+  const{list,all}=libList(), L=U.lib;
+  if(!all.length)return `<div class="emptybig"><h2 class="title">Your library is empty</h2><p>Cards land here after you approve them in the review queue.</p><div class="btnrow"><button class="btn primary" data-act="goto" data-go="${S.cards.some(c=>c.status==='queue')?'review':'notes'}">${S.cards.some(c=>c.status==='queue')?'Open the review queue':'Add notes'}</button></div></div>`;
+  return `<div class="rvhead"><div><h2 class="title">Library</h2><p class="muted">Every card here was checked by you against your notes.</p></div><div class="btnrow"><button class="btn sm" data-act="exportCSV">Export CSV</button><button class="btn sm" data-act="exportAnki">Export for Anki</button></div></div>
+  <div class="libbar"><input type="search" id="libQ" placeholder="Search questions, answers and source sentences ( / )" value="${esc(L.q)}" aria-label="Search library">
+  ${srcFilterHTML('libSrc',L.src,'Filter by note')}
+  <select id="libType" aria-label="Card type"><option value="">All types</option>${Object.entries(TYPE_LABEL).map(([k,v])=>`<option value="${k}" ${L.type===k?'selected':''}>${v}</option>`).join('')}</select>
+  <select id="libSort" aria-label="Sort"><option value="note" ${L.sort==='note'?'selected':''}>Note order</option><option value="new" ${L.sort==='new'?'selected':''}>Newest</option><option value="weak" ${L.sort==='weak'?'selected':''}>Weakest first</option><option value="az" ${L.sort==='az'?'selected':''}>A–Z</option></select></div>
+  <p class="muted" id="libCount" style="margin:0;font-size:13px">${list.length===all.length?plural(all.length,'card'):`${list.length} of ${all.length} cards`}</p>
+  <div class="liblist" id="libList">${list.map(libRowHTML).join('')||'<p class="empty" style="padding:20px 0">No cards match.</p>'}</div>`;
+};
+function libRowHTML(c){
+  const src=srcById(c.src), open=U.lib.open===c.id, q=U.lib.q;
+  return `<article class="lrow${open?' open':''}"><button class="lmain" data-act="libOpen" data-id="${c.id}" aria-expanded="${open}"><span class="lf">${hl(c.front,q)}</span><span class="lb">${hl(c.back,q)}</span>
+  <span class="lmeta"><span class="chip">${TYPE_LABEL[c.type]}</span><span class="chip quiet">${esc(trunc(src?src.title:'Deleted note',30))}</span>${c.edited?'<span class="chip edited">Edited</span>':''}${c.trace==='close'?'<span class="chip warnchip">Close match</span>':c.trace==='missing'?'<span class="chip badchip">Not in notes</span>':''}<span class="pips" title="Level ${c.box||0} of 5">${[1,2,3,4,5].map(i=>`<i class="${(c.box||0)>=i?'on':''}"></i>`).join('')}</span></span></button>${open?libDetailHTML(c,src):''}</article>`;
+}
+function libDetailHTML(c,src){
+  if(U.lib.edit)return `<div class="ldetail"><label class="fl" style="margin-top:14px">Front<textarea id="leFront" rows="2">${esc(c.front)}</textarea></label>${c.type==='mcq'?`<fieldset class="opts"><legend>Choices</legend>${c.options.map((o,i)=>`<div class="optrow"><input type="radio" name="leAns" value="${i}" ${i===c.answer?'checked':''} aria-label="Choice ${i+1} is correct"><input type="text" class="leOpt" value="${esc(o)}"></div>`).join('')}</fieldset>`:`<label class="fl">Back<textarea id="leBack" rows="2">${esc(c.back)}</textarea></label>`}<div class="btnrow"><button class="btn primary sm" data-act="libSave" data-id="${c.id}">Save</button><button class="btn sm" data-act="libCancel">Cancel</button></div></div>`;
+  const quote=quoteOf(c);
+  return `<div class="ldetail">${c.type==='mcq'?`<ol class="optlist" type="A">${c.options.map((o,i)=>`<li class="${i===c.answer?'right':''}">${esc(o)}</li>`).join('')}</ol>`:''}
+  <div class="quote">${esc(quote||'(no source sentence)')}<small>From “${esc(src?src.title:'Deleted note')}” · drafted by ${esc((PROV[c.engine]||{}).name||c.engine)}${c.seen?` · ${c.right||0}/${c.seen} correct`:''}</small></div>
+  <div class="btnrow">${src&&c.a?`<button class="btn sm" data-act="openNote" data-id="${src.id}" data-s="${c.a[0]}">Show in note</button>`:''}<button class="btn sm" data-act="libEdit" data-id="${c.id}">Edit</button><button class="btn sm" data-act="libRequeue" data-id="${c.id}">Send back to review</button><button class="btn sm ghost" data-act="libDelete" data-id="${c.id}">Delete</button></div></div>`;
+}
+function refreshLib(){
+  const{list,all}=libList();
+  $('#libList').innerHTML=list.map(libRowHTML).join('')||'<p class="empty" style="padding:20px 0">No cards match.</p>';
+  $('#libCount').textContent=list.length===all.length?plural(all.length,'card'):`${list.length} of ${all.length} cards`;
+}
+
+/* study */
+VIEWS.study=()=>{
+  const lib=libCards();
+  if(!lib.length)return `<div class="emptybig"><h2 class="title">Nothing to study yet</h2><p>Approve cards in the review queue first. Only checked cards show up here.</p><div class="btnrow"><button class="btn primary" data-act="goto" data-go="${S.cards.some(c=>c.status==='queue')?'review':'notes'}">${S.cards.some(c=>c.status==='queue')?'Open the review queue':'Add notes'}</button></div></div>`;
+  if(U.study)return U.study.done?studyDoneHTML():studyCardHTML();
+  const cfg=U.studyCfg, due=dueCards().length; if(cfg.deck==='due'&&!due)cfg.deck='all';
+  return `<section class="card narrow"><h2><span class="step">4</span>Study<span class="sub">${plural(lib.length,'card')} · ${due} due</span></h2>
+  <div class="seg2" role="radiogroup" aria-label="Mode"><button role="radio" aria-checked="${cfg.mode==='flash'}" data-act="smode" data-m="flash"><b>Flashcards</b><small>Flip, then rate yourself</small></button><button role="radio" aria-checked="${cfg.mode==='quiz'}" data-act="smode" data-m="quiz"><b>Quiz</b><small>Pick from four choices</small></button></div>
+  <label>Deck<select id="sDeck"><option value="due" ${cfg.deck==='due'?'selected':''} ${due?'':'disabled'}>Due now (${due})</option><option value="all" ${cfg.deck==='all'?'selected':''}>All cards, shuffled (${lib.length})</option><option value="weak" ${cfg.deck==='weak'?'selected':''}>Weakest first</option>${S.sources.map(s=>{const n=lib.filter(c=>c.src===s.id).length;return n?`<option value="src:${s.id}" ${cfg.deck==='src:'+s.id?'selected':''}>${esc(trunc(s.title,40))} (${n})</option>`:''}).join('')}</select></label>
+  <label>Cards per session<select id="sN"><option value="10" ${cfg.n==='10'?'selected':''}>10</option><option value="20" ${cfg.n==='20'?'selected':''}>20</option><option value="999" ${cfg.n==='999'?'selected':''}>All</option></select></label>
+  <button class="btn primary wide" data-act="startStudy">Start</button>
+  <p class="hint">Cards you know move up a level and come back later (1, 3, 7, 16, then 35 days). Misses come back today.${cfg.mode==='quiz'?' Flashcards get four choices built from your other answers.':''}</p></section>`;
+};
+function startStudy(ids){
+  const cfg=U.studyCfg, lib=libCards();
+  if(!ids){
+    let pick;
+    if(cfg.deck==='due')pick=dueCards().sort((a,b)=>(a.due||0)-(b.due||0));
+    else if(cfg.deck==='weak')pick=lib.slice().sort((a,b)=>(a.box||0)-(b.box||0)||(b.lapses||0)-(a.lapses||0)||((a.right||0)/(a.seen||1))-((b.right||0)/(b.seen||1)));
+    else if(cfg.deck.startsWith('src:'))pick=shuffle(lib.filter(c=>c.src===cfg.deck.slice(4)));
+    else pick=shuffle(lib.slice());
+    ids=pick.slice(0,+cfg.n).map(c=>c.id);
+  }
+  if(!ids.length)return toast('No cards in that deck.');
+  U.study={mode:cfg.mode,ids,i:0,shown:false,picked:null,typed:'',res:[],done:false};
+  prepQ(); render();
+}
+function prepQ(){
+  const s=U.study, c=cardById(s.ids[s.i]); s.q=null; if(!c||s.mode!=='quiz')return;
+  if(c.type==='mcq'){s.q={opts:c.options.slice(),ans:c.answer};return}
+  const pool=libCards().filter(o=>o.id!==c.id&&o.type!=='mcq'&&fkey(o.back)!==fkey(c.back)&&o.back.length<=Math.max(40,c.back.length*2.2));
+  const pref=shuffle(pool.filter(o=>o.type===c.type&&o.src===c.src)), rest=shuffle(pool.filter(o=>!(o.type===c.type&&o.src===c.src)));
+  const picks=[]; for(const o of[...pref,...rest]){if(picks.length>=3)break;if(!picks.some(p=>fkey(p)===fkey(o.back)))picks.push(o.back)}
+  if(picks.length<3){s.q={typed:true};return}
+  const opts=shuffle([c.back,...picks]); s.q={opts,ans:opts.indexOf(c.back)};
+}
+function frontHTML(c,reveal){
+  const f=esc(c.front);
+  if(c.type!=='cloze')return f;
+  return reveal?f.replace('_____',`<span class="fill">${esc(c.back)}</span>`):f.replace('_____','<span class="blank">_____</span>');
+}
+function srcNoteHTML(c){const s=srcById(c.src),q=quoteOf(c);return q?`<div class="srcnote"><small>From your notes${s?' · '+esc(trunc(s.title,40)):''}</small>${esc(q)}</div>`:''}
+function studyCardHTML(){
+  const s=U.study, c=cardById(s.ids[s.i]);
+  if(!c){s.i++;if(s.i>=s.ids.length)s.done=true;else prepQ();return VIEWS.study()}
+  const bar=`<div class="sbar"><button class="btn sm ghost" data-act="endStudy">End</button><div class="prog" aria-hidden="true"><i style="width:${pct(s.i,s.ids.length)}%"></i></div><span class="count">${s.i+1} / ${s.ids.length}</span></div>`;
+  if(s.mode==='flash'){
+    const opts=c.type==='mcq'?`<ol class="optlist" type="A" style="text-align:left;margin:0 auto">${c.options.map((o,i)=>`<li class="${s.shown&&i===c.answer?'right':''}">${esc(o)}</li>`).join('')}</ol>`:'';
+    return `<div class="studywrap">${bar}<div class="flash"><div class="ff">${frontHTML(c,s.shown)}</div>${opts}${s.shown?(c.type==='cloze'?'':`<div class="fb">${esc(c.back)}</div>`)+srcNoteHTML(c):''}</div>
+    ${s.shown?`<div class="grades"><button class="btn g0" data-act="grade" data-g="0">Missed it<small>1 · again today</small></button><button class="btn" data-act="grade" data-g="1">Shaky<small>2 · tomorrow</small></button><button class="btn g2" data-act="grade" data-g="2">Knew it<small>3 · level up</small></button></div>`:`<button class="btn primary wide" style="margin-top:14px" data-act="flip">Show answer<kbd>Space</kbd></button>`}</div>`;
+  }
+  const q=s.q||{typed:true}, answered=s.picked!=null;
+  let body;
+  if(q.typed){
+    body=answered?`<div class="fb">${esc(c.back)}</div>${srcNoteHTML(c)}`:`<input type="text" id="typed" placeholder="Type your answer" value="${esc(s.typed)}" autocomplete="off" style="font-size:16px">`;
+  }else{
+    body=`<div class="choices">${q.opts.map((o,i)=>{let cls='';if(answered){if(i===q.ans)cls='right';else if(i===s.picked)cls='wrong';else cls='dim'}return `<button class="btn choice ${cls}" data-act="pick" data-i="${i}" ${answered?'disabled':''}><span class="k">${'ABCD'[i]||i+1}</span>${esc(o)}</button>`}).join('')}</div>${answered?srcNoteHTML(c):''}`;
+  }
+  let foot='';
+  if(!answered)foot=q.typed?`<button class="btn primary wide" style="margin-top:14px" data-act="checkTyped">Check<kbd>Enter</kbd></button>`:'';
+  else if(q.typed&&s.selfGrade==null)foot=`<p class="verdict">${s.autoOk?'Looks right. ':''}Did you get it?</p><div class="grades" style="grid-template-columns:1fr 1fr"><button class="btn g0" data-act="selfGrade" data-g="0">No<small>1</small></button><button class="btn g2" data-act="selfGrade" data-g="2">Yes<small>2</small></button></div>`;
+  else foot=`<p class="verdict ${s.lastOk?'ok':'no'}">${s.lastOk?'Correct':'Not quite'}</p><button class="btn primary wide" style="margin-top:10px" data-act="nextQ">${s.i+1<s.ids.length?'Next':'Finish'}<kbd>Enter</kbd></button>`;
+  return `<div class="studywrap">${bar}<div class="flash" style="min-height:0"><div class="ff">${frontHTML(c,answered)}</div>${body}</div>${foot}</div>`;
+}
+function grade(c,g){
+  const now=Date.now();
+  c.seen=(c.seen||0)+1;
+  if(g===0){c.box=1;c.lapses=(c.lapses||0)+1;c.due=now}
+  else if(g===1){c.box=Math.max(1,c.box||0);c.due=now+DAY;c.right=(c.right||0)+1}
+  else{c.box=Math.min(5,(c.box||0)+1);c.due=now+BOX_DAYS[c.box]*DAY;c.right=(c.right||0)+1}
+  const d=dkey(now), day=S.days[d]||(S.days[d]={n:0,ok:0}); day.n++; if(g>0)day.ok++;
+  U.study.res.push({id:c.id,ok:g>0}); save();
+}
+function advance(){const s=U.study;s.i++;s.shown=false;s.picked=null;s.typed='';s.selfGrade=null;s.autoOk=false;if(s.i>=s.ids.length)s.done=true;else prepQ();render()}
+function studyDoneHTML(){
+  const s=U.study, ok=s.res.filter(r=>r.ok).length, missed=s.res.filter(r=>!r.ok).map(r=>cardById(r.id)).filter(Boolean);
+  return `<section class="card narrow" style="text-align:center"><h2>Session done</h2><div class="score">${ok}/${s.res.length}</div><p class="muted" style="margin:0">${s.res.length?pct(ok,s.res.length)+'% right':'No answers logged'} · ${plural(streak(),'day')} in a row</p>
+  ${missed.length?`<ul class="missed">${missed.map(c=>`<li><b>${esc(c.front.split('\n')[0])}</b><span>${esc(c.back)}</span></li>`).join('')}</ul>`:''}
+  <div class="btnrow" style="justify-content:center;margin-top:16px">${missed.length?'<button class="btn primary" data-act="againMissed">Study the misses again</button>':''}<button class="btn" data-act="endStudy">Done</button></div></section>`;
+}
+function similar(a,b){const A=toks(a),B=toks(b);if(!B.size)return fkey(a)===fkey(b);let i=0;B.forEach(w=>{if(A.has(w))i++});return i/B.size>=0.7}
+
+/* progress */
+VIEWS.progress=()=>{
+  const st=stats();
+  const kpi=(v,l)=>`<div class="kpi"><b>${v}</b><span>${l}</span></div>`;
+  const tot=st.total||1, seg=(n,cls,l)=>n?`<i class="${cls}" style="flex:${n}" title="${l}: ${n}"></i>`:'';
+  const funnel=st.total?`<div class="funnel" role="img" aria-label="${st.asis} approved as written, ${st.edited} approved after edits, ${st.disc} discarded, ${st.queue} waiting">${seg(st.asis,'f-ok','Approved as written')}${seg(st.edited,'f-ed','Approved after edits')}${seg(st.disc,'f-bad','Discarded')}${seg(st.queue,'f-q','Waiting in review')}</div>
+  <ul class="flegend"><li><i class="f-ok"></i>Approved as written<b>${st.asis}</b></li><li><i class="f-ed"></i>Approved after edits<b>${st.edited}</b></li><li><i class="f-bad"></i>Discarded<b>${st.disc}</b></li><li><i class="f-q"></i>Waiting in review<b>${st.queue}</b></li></ul>`:'<p class="empty">No drafts yet.</p>';
+  const engRows=Object.entries(st.eng).map(([k,e])=>{const done=e.asis+e.edited+e.disc;return `<tr><td>${esc((PROV[k]||{}).name||k)}</td><td class="n">${e.n}</td><td class="n">${done?pct(e.asis,done)+'%':'–'}</td><td class="n">${e.edited}</td><td class="n">${e.disc}</td></tr>`}).join('');
+  const reasons=Object.entries(st.reasons).sort((a,b)=>b[1]-a[1]);
+  const edits=libCards().filter(c=>c.edited).sort((a,b)=>(b.reviewed||0)-(a.reviewed||0)).slice(0,5);
+  if(U.writeup==null)U.writeup=composeWriteup(st);
+  return `<div class="rvhead"><div><h2 class="title">Progress</h2><p class="muted">What you’ve studied, and what the review queue caught.</p></div></div>
+  <div class="kpis">${kpi(st.lib,'cards in library')}${kpi(st.mastered,'mastered (level 4+)')}${kpi(st.due,'due now')}${kpi(st.streak,'day streak')}${kpi(st.wkN?pct(st.wkOk,st.wkN)+'%':'–','right, last 7 days')}</div>
+  <div class="grid2"><div class="stack">
+  <section class="card"><h2>Review queue<span class="sub">${plural(st.total,'draft')}</span></h2>${funnel}
+  ${st.total?`<p class="hint" style="margin-top:14px">${plural(st.exact,'draft')} quoted your notes exactly, ${st.close} ${st.close===1?'was a close match':'were close matches'} and ${st.missing} quoted text that isn’t in your notes${st.missing?` (${st.missCaught} of those caught: discarded or fixed)`:''}.</p>`:''}</section>
+  ${engRows?`<section class="card"><h2>By drafting engine</h2><table class="mini"><thead><tr><th>Engine</th><th class="n">Drafts</th><th class="n">Kept as written</th><th class="n">Edited</th><th class="n">Discarded</th></tr></thead><tbody>${engRows}</tbody></table></section>`:''}
+  ${reasons.length?`<section class="card"><h2>Why drafts were discarded</h2><table class="mini"><tbody>${reasons.map(([r,n])=>`<tr><td>${esc(r)}</td><td class="n">${n}</td></tr>`).join('')}</tbody></table></section>`:''}
+  ${edits.length?`<section class="card"><h2>Fixes you made<span class="sub">latest ${edits.length}</span></h2><div class="edits">${edits.map(c=>`<div class="edit"><div class="before"><small>Draft</small>${esc(c.orig.front)}\n→ ${esc(c.orig.back)}</div><div><small>Your version</small>${esc(c.front)}\n→ ${esc(c.back)}</div></div>`).join('')}</div></section>`:''}
+  </div><div class="stack">
+  <section class="card"><h2>Write-up<span class="sub">for your submission</span></h2><p class="hint" style="margin:0 0 10px">A starting draft built from your real numbers. Make it yours, then copy it.</p><textarea id="writeup" aria-label="Write-up">${esc(U.writeup)}</textarea><div class="btnrow" style="margin-top:10px"><button class="btn primary" data-act="copyWriteup">Copy</button><button class="btn ghost" data-act="resetWriteup">Rebuild from latest numbers</button></div></section>
+  <section class="card"><h2>Things worth mentioning</h2><ul class="obs">${observations(st).map(o=>`<li>${esc(o)}</li>`).join('')||'<li>Review a few drafts and these fill in.</li>'}</ul></section>
+  </div></div>`;
+};
+function observations(st){
+  const o=[];
+  if(st.reviewed){
+    o.push(`${pct(st.edited+st.disc,st.reviewed)}% of the drafts I checked needed a fix or got thrown out.`);
+    const top=Object.entries(st.reasons).filter(([r])=>r!=='No reason given').sort((a,b)=>b[1]-a[1])[0];
+    if(top)o.push(`The most common reason I discarded a draft: “${top[0]}” (${top[1]}).`);
+    const types=Object.entries(st.type).map(([k,t])=>({k,d:t.asis+t.edited+t.disc,bad:t.edited+t.disc})).filter(t=>t.d>=3).sort((a,b)=>b.bad/b.d-a.bad/a.d);
+    if(types.length>1)o.push(`${TYPE_LABEL[types[0].k]} cards needed the most work (${pct(types[0].bad,types[0].d)}% fixed or discarded); ${TYPE_LABEL[types[types.length-1].k].toLowerCase()} cards needed the least (${pct(types[types.length-1].bad,types[types.length-1].d)}%).`);
+    if(st.missing)o.push(`${plural(st.missing,'draft')} quoted ${st.missing===1?'a sentence that isn’t':'sentences that aren’t'} in my notes. Seeing the source beside the card made that obvious.`);
+    if(st.close)o.push(`${plural(st.close,'draft')} paraphrased my notes instead of quoting ${st.close===1?'them':'them'}, so I compared the wording by eye.`);
+    const engs=Object.entries(st.eng).map(([k,e])=>({k,d:e.asis+e.edited+e.disc,asis:e.asis})).filter(e=>e.d>=3);
+    if(engs.length>1)o.push(engs.map(e=>`${(PROV[e.k]||{}).name||e.k} drafts were kept as written ${pct(e.asis,e.d)}% of the time`).join('; ')+'.');
+  }
+  if(st.studied)o.push(`I’ve answered ${st.studied} questions${st.wkN?`, ${pct(st.wkOk,st.wkN)}% right this week`:''}, and ${plural(st.mastered,'card')} ${st.mastered===1?'has':'have'} reached level 4.`);
+  return o;
+}
+function composeWriteup(st){
+  const n=S.sources.length;
+  const how=st.reviewed?`I checked ${plural(st.reviewed,'draft')} from ${plural(n,'note')}: ${st.asis} approved as written, ${st.edited} fixed before approving and ${st.disc} discarded.${st.missing?` ${plural(st.missing,'draft')} quoted text that isn’t in my notes, and the queue flagged ${st.missing===1?'it':'them'} in red before ${st.missing===1?'it':'they'} could reach my library.`:''}`:'[Review some drafts and this fills in with your numbers.]';
+  const obs=observations(st).slice(1,4).join(' ')||'[What did you notice when you compared the cards with your notes?]';
+  return `ToothOps Study: a living study guide built from my own notes
+
+ToothOps Study turns my class notes into flashcards and quiz questions, but nothing reaches my library until I check it. Each draft sits in a review queue beside the exact sentence from my notes it was based on, so I can approve, edit or discard it in seconds. Approved cards go into a searchable library with flashcards, quizzes and spaced review. Progress saves on my device, and a passphrase lock keeps it private.
+
+How the review queue worked for me: ${how}
+
+What I noticed: ${obs}`;
+}
+
+/* settings drawer */
+function openDrawer(focus){U.drawer=true;renderDrawer();$('#drawer').hidden=false;$('#scrim').hidden=false;if(focus==='lock'){const el=$('#lockSec');el&&el.scrollIntoView({block:'start'});setTimeout(()=>{const p=$('#lp1');p&&p.focus()},60)}else $('#drawer button').focus()}
+function closeDrawer(){if(U)U.drawer=false;$('#drawer').hidden=true;$('#scrim').hidden=true}
+function renderDrawer(){
+  const st=S.settings, n=S.cards.length;
+  const lock=cryptoKey?`<div class="lockon">● Lock is on</div><p>Your notes, cards and remembered keys are encrypted on this device with your passphrase (AES-256-GCM, key derived with PBKDF2).</p>
+  <div class="inline">Lock after<select id="autolock">${[[5,'5 minutes'],[15,'15 minutes'],[30,'30 minutes'],[60,'1 hour'],[0,'never']].map(([v,l])=>`<option value="${v}" ${+st.autolock===v?'selected':''}>${l}</option>`).join('')}</select>idle</div>
+  <div class="btnrow"><button class="btn sm primary" data-act="lockNow">Lock now</button><button class="btn sm" data-act="showChange">Change passphrase</button><button class="btn sm ghost" data-act="removeLock">Turn off lock</button></div>
+  <div id="changeBox" hidden style="margin-top:12px"><input type="password" id="lp1" placeholder="New passphrase (8+ characters)" autocomplete="new-password"><input type="password" id="lp2" placeholder="Repeat it" autocomplete="new-password"><button class="btn sm primary" data-act="setPass" style="margin-top:8px">Save new passphrase</button></div>`
+  :`<p>Keep this study guide private on this device. Your notes and cards get encrypted with a passphrase; anyone opening this page in this browser sees a lock screen. There’s no account and no reset: if you forget it, the data can’t be recovered, so export a backup first.</p>
+  <input type="password" id="lp1" placeholder="Passphrase (8+ characters)" autocomplete="new-password"><input type="password" id="lp2" placeholder="Repeat it" autocomplete="new-password"><button class="btn primary" data-act="setPass" style="margin-top:10px">Turn on lock</button>`;
+  $('#drawer').innerHTML=`<div class="dhead"><h2>Settings</h2><button class="icon" data-act="closeDrawer" aria-label="Close settings">×</button></div>
+  <section><h3>Appearance</h3><div class="seg3" role="radiogroup" aria-label="Theme">${['system','light','dark'].map(t=>`<button role="radio" aria-checked="${st.theme===t}" data-act="theme" data-t="${t}">${cap(t)}</button>`).join('')}</div></section>
+  <section id="lockSec"><h3>Lock</h3>${DEMO?'<p>Turn this on in your own copy. The demo doesn’t save anything.</p>':lock}</section>
+  <section><h3>AI keys</h3><p>Only needed for the Claude, Gemini or OpenAI drafting engines. Keys go from your browser straight to that provider.</p>
+  ${['claude','gemini','openai'].map(p=>`<label>${PROV[p].vendor}<input type="password" class="dkey" data-p="${p}" value="${esc(getKey(p))}" placeholder="${PROV[p].ph}" autocomplete="off" spellcheck="false"></label>`).join('')}
+  <label class="check"><input type="checkbox" id="remember2" ${st.remember?'checked':''}> Remember keys on this device${cryptoKey?' (encrypted)':' (unencrypted until you turn on the lock)'}</label></section>
+  <section><h3>Backup &amp; export</h3><p>Everything lives in this browser. Another browser or device starts empty, so use a backup to move it.</p><div class="btnrow"><button class="btn sm" data-act="exportJSON">Download backup</button><button class="btn sm" data-act="importJSON">Restore backup</button><button class="btn sm" data-act="exportCSV">CSV</button><button class="btn sm" data-act="exportAnki">Anki</button></div></section>
+  <section><h3>Start over</h3><p>${plural(S.sources.length,'note')}, ${plural(n,'card')} and your study history.</p><button class="btn sm warnbtn" data-act="erase">Erase everything on this device</button></section>`;
+}
+
+/* exports */
+function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+const csvCell=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+function exportCSV(){const rows=[['front','back','type','choices','concept','source note','source sentence','level']].concat(libCards().map(c=>[c.front,c.back,TYPE_LABEL[c.type],(c.options||[]).join(' | '),c.concept,(srcById(c.src)||{}).title||'',quoteOf(c),c.box||0]));download('toothops-study-cards.csv',rows.map(r=>r.map(csvCell).join(',')).join('\n'),'text/csv')}
+function exportAnki(){const h=s=>esc(s).replace(/\t/g,' ').replace(/\n/g,'<br>');download('toothops-study-anki.txt','#separator:tab\n#html:true\n'+libCards().map(c=>{const f=c.type==='mcq'?h(c.front)+'<br><br>'+c.options.map((o,i)=>'ABCD'[i]+'. '+h(o)).join('<br>'):h(c.front);const q=quoteOf(c);return f+'\t'+h(c.back)+(q?'<br><br><small>'+h(q)+'</small>':'')}).join('\n'),'text/plain')}
+function exportJSON(){const copy=JSON.parse(JSON.stringify(S));copy.settings.keys={};download(`toothops-study-backup-${dkey()}.json`,JSON.stringify(copy,null,1),'application/json')}
+
+/* file import */
+const loaded={};
+function loadScript(src){return loaded[src]||(loaded[src]=new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>{delete loaded[src];rej(new Error('Couldn’t load the file reader. Check your connection.'))};document.head.appendChild(s)}))}
+async function readFile(file){
+  const ext=(file.name.split('.').pop()||'').toLowerCase();
+  if(['txt','md','markdown','text'].includes(ext)||(file.type||'').startsWith('text/'))return file.text();
+  if(ext==='pdf'){
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise, pages=[];
+    for(let p=1;p<=pdf.numPages;p++){const tc=await(await pdf.getPage(p)).getTextContent();pages.push(tc.items.map(it=>it.str+(it.hasEOL?'\n':'')).join('').replace(/[ \t]+\n/g,'\n').trim())}
+    return pages.filter(Boolean).join('\n\n');
+  }
+  if(ext==='docx'){
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js');
+    return(await mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()})).value;
+  }
+  throw new Error('Use a .txt, .md, .pdf or .docx file.');
+}
+
+/* ---------- actions ---------- */
+const ACT={
+  phase:b=>b.dataset.go==='lock'?openDrawer('lock'):go(b.dataset.go),
+  goto:b=>go(b.dataset.go),
+  pickNote:b=>{U.sel=b.dataset.id;U.gen.msg='';U.gen.err='';render()},
+  delNote:b=>{const s=srcById(b.dataset.id);if(!s)return;const n=S.cards.filter(c=>c.src===s.id).length;if(!confirm(`Delete “${s.title}”${n?` and its ${plural(n,'card')}`:''}? This can’t be undone.`))return;S.sources=S.sources.filter(x=>x!==s);S.cards=S.cards.filter(c=>c.src!==s.id);if(U.sel===s.id)U.sel=null;save();render()},
+  saveNote:()=>{
+    const text=U.draft.text.trim(); if(words(text)<5){toast('Paste a bit more text first.');$('#nText').focus();return}
+    const title=U.draft.title.trim()||trunc(text.split('\n').find(l=>l.trim()).replace(/^#+\s*/,'').trim(),60);
+    const s=addSource(title,text); U.sel=s.id; U.draft={title:'',text:''}; U.nMsg=''; U.gen={busy:false,msg:'',err:''};
+    render(); toast('Note saved. Next: draft cards.');
+  },
+  sample:()=>{let s=S.sources.find(x=>x.title===SAMPLE.title&&x.text===SAMPLE.text);if(!s)s=addSource(SAMPLE.title,SAMPLE.text);U.sel=s.id;U.gen={busy:false,msg:'',err:''};render();toast('Sample notes loaded. Now draft some cards.')},
+  engine:b=>{S.settings.engine=b.dataset.k;U.gen.err='';U.gen.msg='';save();render()},
+  generate:()=>generate(),
+  copyPrompt:async()=>{const s=srcById(U.sel);if(!s)return;const p=pastePrompt(s);try{await navigator.clipboard.writeText(p);toast(s.text.length>60000?'Copied. This note is long; some chatbots may cut it off.':'Prompt copied. Paste it into your chatbot.')}catch{U.paste='';const box=$('#pasteBox');if(box){box.value=p;box.select()}toast('Couldn’t copy automatically. The prompt is in the box; copy it from there.')}},
+  importReply:()=>{
+    const src=srcById(U.sel); if(!src)return;
+    try{const out=parseAI(U.paste);src.aiConcepts=out.concepts.slice(0,40).map(c=>({term:String(c.term),why:String(c.why||'')}));const added=addDrafts(src,out.cards.map(c=>anchorAI(src,c)),'paste');U.paste='';U.gen.err='';afterDraft(src,added)}
+    catch(e){U.gen.err=e.message;render()}
+  },
+  concept:b=>{U.lib.q=b.dataset.term;U.lib.src='';U.lib.type='';U.lib.open=null;go('library')},
+  openNote:b=>{U.sel=b.dataset.id;U.focusA=b.dataset.s===''?null:+b.dataset.s;go('notes')},
+  approve:b=>approve(!!(b&&b.dataset&&b.dataset.force)),
+  discard:()=>{U.r.discard=true;render()},
+  why:b=>discard(+b.dataset.i),
+  cancelDiscard:()=>{U.r.discard=false;render()},
+  cancelConfirm:()=>{U.r.confirm=false;render()},
+  skip:()=>{const n=queue().length;U.r.idx=n?(U.r.idx+1)%n:0;U.r.discard=U.r.confirm=false;render()},
+  next:()=>ACT.skip(),
+  prev:()=>{const n=queue().length;U.r.idx=n?(U.r.idx-1+n)%n:0;U.r.discard=U.r.confirm=false;render()},
+  libOpen:b=>{U.lib.open=U.lib.open===b.dataset.id?null:b.dataset.id;U.lib.edit=false;refreshLib()},
+  libEdit:()=>{U.lib.edit=true;refreshLib();const f=$('#leFront');f&&f.focus()},
+  libCancel:()=>{U.lib.edit=false;refreshLib()},
+  libSave:b=>{
+    const c=cardById(b.dataset.id); if(!c)return;
+    const f=$('#leFront').value.trim();
+    if(c.type==='mcq'){const opts=$$('.leOpt').map(i=>i.value.trim()),r=$('input[name=leAns]:checked'),a=r?+r.value:c.answer;if(!f||opts.filter(Boolean).length<2||!opts[a])return toast('Needs a question, two or more choices and a correct one.');c.options=opts;c.answer=a;c.back=opts[a]}
+    else{const bk=$('#leBack').value.trim();if(!f||!bk)return toast('Fill in both sides.');c.back=bk}
+    c.front=f; c.edited=isEdited(c); U.lib.edit=false; save(); refreshLib(); toast('Saved');
+  },
+  libRequeue:b=>{const c=cardById(b.dataset.id);if(!c)return;c.status='queue';delete c.reviewed;U.lib.open=null;save();render();toast('Sent back to the review queue','Open queue',()=>{U.r.src='';U.r.idx=Math.max(0,queue().findIndex(x=>x.id===c.id));go('review')})},
+  libDelete:b=>{const c=cardById(b.dataset.id);if(!c||!confirm('Delete this card?'))return;S.cards=S.cards.filter(x=>x!==c);save();render()},
+  exportCSV:()=>libCards().length?exportCSV():toast('No approved cards to export yet.'),
+  exportAnki:()=>libCards().length?exportAnki():toast('No approved cards to export yet.'),
+  exportJSON:()=>exportJSON(),
+  importJSON:()=>$('#backupFile').click(),
+  smode:b=>{U.studyCfg.mode=b.dataset.m;render()},
+  startStudy:()=>startStudy(),
+  endStudy:()=>{U.study=null;render()},
+  againMissed:()=>{const ids=U.study.res.filter(r=>!r.ok).map(r=>r.id);U.study=null;startStudy([...new Set(ids)])},
+  flip:()=>{U.study.shown=true;render()},
+  grade:b=>{const c=cardById(U.study.ids[U.study.i]);if(c)grade(c,+b.dataset.g);advance()},
+  pick:b=>{
+    const s=U.study; if(!s)return; const c=cardById(s.ids[s.i]); if(!c||s.picked!=null)return;
+    s.picked=+b.dataset.i; s.lastOk=s.picked===s.q.ans; grade(c,s.lastOk?2:0); render();
+  },
+  checkTyped:()=>{const s=U.study,c=cardById(s.ids[s.i]);s.typed=($('#typed')||{}).value||'';if(!s.typed.trim()){toast('Type an answer first, or a guess.');return}s.picked=-1;s.autoOk=similar(s.typed,c.back);s.selfGrade=null;render()},
+  selfGrade:b=>{const s=U.study,c=cardById(s.ids[s.i]);const g=+b.dataset.g;s.selfGrade=g;s.lastOk=g>0;grade(c,g);render()},
+  nextQ:()=>advance(),
+  copyWriteup:async()=>{const t=$('#writeup').value;try{await navigator.clipboard.writeText(t);toast('Write-up copied')}catch{$('#writeup').select();toast('Select-all is on; press Ctrl/⌘+C')}},
+  resetWriteup:()=>{U.writeup=null;render()},
+  closeDrawer:()=>closeDrawer(),
+  theme:b=>{S.settings.theme=b.dataset.t;applyTheme();save();renderDrawer()},
+  lockNow:()=>lockNow(),
+  showChange:()=>{const b=$('#changeBox');b.hidden=!b.hidden;if(!b.hidden)$('#lp1').focus()},
+  setPass:async()=>{
+    const p1=$('#lp1').value,p2=$('#lp2').value;
+    if(p1.length<8)return toast('Use at least 8 characters.');
+    if(p1!==p2)return toast('The two passphrases don’t match.');
+    const was=!!cryptoKey; await setPassphrase(p1); renderDrawer(); render();
+    toast(was?'Passphrase changed.':'Lock is on. You’ll need this passphrase next time.');
+  },
+  removeLock:async()=>{if(!confirm('Turn off the lock? Your data will be stored unencrypted in this browser.'))return;cryptoKey=null;vaultMeta=null;await persist();renderDrawer();render();toast('Lock turned off.')},
+  erase:()=>{if(!confirm('Erase all notes, cards and study history on this device? This can’t be undone.'))return;try{localStorage.removeItem(K_DATA);localStorage.removeItem(K_VAULT);sessionStorage.removeItem(K_KEYS)}catch{}KEYS={};cryptoKey=null;vaultMeta=null;S=blank();U=freshUI();closeDrawer();applyTheme();save();go('notes');render();toast('Everything on this device was erased.')}
+};
+/* ---------- events ---------- */
+document.addEventListener('click',e=>{
+  const tab=e.target.closest('.tabs [data-tab]'); if(tab){go(tab.dataset.tab);return}
+  const b=e.target.closest('[data-act]'); if(!b||!S)return;
+  const fn=ACT[b.dataset.act]; if(fn)fn(b,e);
+});
+$('#view').addEventListener('click',e=>{
+  const cov=e.target.closest('.cov'); if(!cov||!S)return;
+  const s=+cov.dataset.s, c=S.cards.find(x=>x.src===U.sel&&x.a&&x.a[0]===s&&(x.status==='library'||x.status==='queue'));
+  if(!c)return;
+  if(c.status==='queue'){U.r.src='';U.r.idx=Math.max(0,queue().findIndex(x=>x.id===c.id));go('review')}
+  else{U.lib={q:'',src:'',type:'',sort:'note',open:c.id,edit:false};go('library')}
+});
+$('#view').addEventListener('input',e=>{
+  const t=e.target;
+  if(t.matches('[data-f],[data-opt]'))onCardField(t);
+  else if(t.id==='nTitle')U.draft.title=t.value;
+  else if(t.id==='nText')U.draft.text=t.value;
+  else if(t.id==='pasteBox')U.paste=t.value;
+  else if(t.id==='gMax'){S.settings.max=+t.value;$('#maxOut').textContent=t.value;save()}
+  else if(t.id==='apiKey')setKey(t.dataset.p,t.value);
+  else if(t.id==='apiModel'){S.settings.models[t.dataset.p]=t.value.trim();save()}
+  else if(t.id==='libQ'){U.lib.q=t.value;U.lib.open=null;refreshLib()}
+  else if(t.id==='writeup')U.writeup=t.value;
+  else if(t.id==='typed'&&U.study)U.study.typed=t.value;
+});
+$('#view').addEventListener('change',async e=>{
+  const t=e.target;
+  if(t.matches('[data-ans]'))onCardField(t);
+  else if(t.dataset.type){S.settings.types[t.dataset.type]=t.checked;save()}
+  else if(t.id==='remember'||t.id==='remember2')setRemember(t.checked);
+  else if(t.id==='rvSrc'){U.r.src=t.value;U.r.idx=0;render()}
+  else if(t.id==='libSrc'){U.lib.src=t.value;refreshLib()}
+  else if(t.id==='libType'){U.lib.type=t.value;refreshLib()}
+  else if(t.id==='libSort'){U.lib.sort=t.value;refreshLib()}
+  else if(t.id==='sDeck')U.studyCfg.deck=t.value;
+  else if(t.id==='sN')U.studyCfg.n=t.value;
+  else if(t.id==='nFile'&&t.files[0]){
+    const f=t.files[0]; U.nMsg='Reading '+f.name+'…'; $('#nMsg').textContent=U.nMsg;
+    try{
+      const text=(await readFile(f)).replace(/\r\n?/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+      if(!text)throw new Error('No text found. A scanned PDF has no text layer; paste the text instead.');
+      U.draft.text=text; if(!U.draft.title)U.draft.title=f.name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ');
+      U.nMsg=`Pulled ${words(text).toLocaleString()} words from ${f.name}. Trim anything you don’t need, then save.`;
+    }catch(err){U.nMsg=err.message}
+    render();
+  }
+});
+$('#view').addEventListener('keydown',e=>{
+  if(e.target.id==='uploadLbl'&&(e.key==='Enter'||e.key===' ')){e.preventDefault();$('#nFile').click()}
+  if(e.target.id==='typed'&&e.key==='Enter'){e.preventDefault();ACT.checkTyped()}
+});
+function setRemember(on){S.settings.remember=on;S.settings.keys=on?Object.assign({},S.settings.keys,KEYS):{};save();if(U.drawer)renderDrawer();render()}
+$('#drawer').addEventListener('input',e=>{const t=e.target;if(t.classList.contains('dkey'))setKey(t.dataset.p,t.value)});
+$('#drawer').addEventListener('change',e=>{const t=e.target;if(t.id==='remember2')setRemember(t.checked);else if(t.id==='autolock'){S.settings.autolock=+t.value;save()}});
+$('#scrim').addEventListener('click',closeDrawer);
+$('#gear').addEventListener('click',()=>U&&(U.drawer?closeDrawer():openDrawer()));
+$('#lockBtn').addEventListener('click',()=>lockNow());
+$('#backupFile').addEventListener('change',async e=>{
+  const f=e.target.files[0]; e.target.value=''; if(!f)return;
+  try{
+    const j=JSON.parse(await f.text());
+    if(!j||!Array.isArray(j.sources)||!Array.isArray(j.cards))throw new Error('That file isn’t a ToothOps Study backup.');
+    if(!confirm(`Replace everything on this device with this backup (${plural(j.sources.length,'note')}, ${plural(j.cards.length,'card')})?`))return;
+    S=migrate(j); await persist(); U=freshUI(); closeDrawer(); applyTheme(); go('notes'); render(); toast('Backup restored.');
+  }catch(err){toast(err.message||'Couldn’t read that file.')}
+});
+$('#lockForm').addEventListener('submit',async e=>{
+  e.preventDefault(); const btn=$('#unlockBtn'); btn.disabled=true; $('#lockErr').textContent='';
+  try{await unlock($('#lockPass').value)}catch(err){$('#lockErr').textContent=err.message;$('#lockPass').select()}
+  btn.disabled=false;
+});
+$('#lockForgot').addEventListener('click',()=>{
+  if(!confirm('There’s no way to recover a forgotten passphrase: the data is encrypted with it.\n\nErase the locked study guide on this device and start fresh?'))return;
+  try{localStorage.removeItem(K_VAULT);localStorage.removeItem(K_DATA)}catch{}
+  S=blank(); U=null; startApp();
+});
+document.addEventListener('keydown',e=>{
+  lastActive=Date.now();
+  if(!S||!U)return;
+  if(e.key==='Escape'&&U.drawer){closeDrawer();return}
+  const typing=/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)||e.target.isContentEditable;
+  if(typing){if(e.key==='Escape')e.target.blur();return}
+  if(e.metaKey||e.ctrlKey||e.altKey||U.drawer)return;
+  const k=e.key.toLowerCase();
+  if(U.tab==='review'&&queue().length){
+    if(U.r.discard){if(/^[1-5]$/.test(k)){e.preventDefault();discard(+k-1)}else if(k==='enter'){e.preventDefault();discard(-1)}else if(k==='escape')ACT.cancelDiscard();return}
+    if(U.r.confirm){if(k==='y'||k==='enter'){e.preventDefault();approve(true)}else if(k==='escape'||k==='n')ACT.cancelConfirm();return}
+    if(k==='a'){e.preventDefault();approve()}
+    else if(k==='d'){e.preventDefault();ACT.discard()}
+    else if(k==='s'||k==='arrowright'){e.preventDefault();ACT.skip()}
+    else if(k==='arrowleft'){e.preventDefault();ACT.prev()}
+    else if(k==='e'){e.preventDefault();const f=$('#fFront');if(f){f.focus();f.setSelectionRange(f.value.length,f.value.length)}}
+  }else if(U.tab==='study'&&U.study&&!U.study.done){
+    const s=U.study;
+    if(s.mode==='flash'){if(!s.shown&&(k===' '||k==='enter')){e.preventDefault();ACT.flip()}else if(s.shown&&/^[1-3]$/.test(k)){e.preventDefault();ACT.grade({dataset:{g:String(+k-1)}})}}
+    else if(s.picked==null&&s.q&&!s.q.typed&&/^[1-4a-d]$/.test(k)){const i=/\d/.test(k)?+k-1:'abcd'.indexOf(k);if(i<s.q.opts.length){e.preventDefault();ACT.pick({dataset:{i:String(i)}})}}
+    else if(s.picked!=null&&s.q&&s.q.typed&&s.selfGrade==null&&/^[12]$/.test(k)){e.preventDefault();ACT.selfGrade({dataset:{g:k==='1'?'0':'2'}})}
+    else if(s.picked!=null&&(!s.q||!s.q.typed||s.selfGrade!=null)&&(k==='enter'||k===' ')){e.preventDefault();advance()}
+  }else if(U.tab==='library'&&k==='/'){e.preventDefault();const q=$('#libQ');q&&q.focus()}
+});
+['pointerdown','wheel','touchstart'].forEach(t=>document.addEventListener(t,()=>{lastActive=Date.now()},{passive:true}));
+setInterval(()=>{if(cryptoKey&&S&&+S.settings.autolock>0&&Date.now()-lastActive>S.settings.autolock*60000)lockNow()},20000);
+window.addEventListener('pagehide',()=>{if(saveTimer)persist()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&saveTimer)persist()});
+
+/* toast */
+function toast(msg,label,fn){
+  const t=$('#toast'); t.innerHTML=`<span>${esc(msg)}</span>${label?`<button class="btn sm" type="button">${esc(label)}</button>`:''}`; t.hidden=false;
+  if(label)t.querySelector('button').onclick=()=>{t.hidden=true;fn()};
+  clearTimeout(toast.t); toast.t=setTimeout(()=>{t.hidden=true},label?6500:3200);
+}
+
+/* ---------- demo ---------- */
+function demoSetup(){
+  const tab=PARAMS.get('demo'); if(TABS.includes(tab))U.tab=tab; else U.tab='review';
+  const src=addSource(SAMPLE.title,SAMPLE.text); U.sel=src.id;
+  addDrafts(src,extract(src,{max:20,types:S.settings.types,skip:new Set()}).cards,'builtin');
+  const pasted=[
+    {type:'qa',front:'What is the most common thermal test for pulp sensibility?',back:'Cold testing.',options:[],answer:-1,concept:'Cold testing',source_quote:'Cold testing is the most common thermal test used to check pulp sensibility.'},
+    {type:'qa',front:'Which nerve fibers does an electric pulp test stimulate first?',back:'A-delta fibers, because they have a lower threshold than C fibers.',options:[],answer:-1,concept:'EPT',source_quote:'EPT stimulates A-delta fibers first because of their lower threshold.'}
+  ];
+  addDrafts(src,pasted.map(c=>anchorAI(src,c)),'paste');
+  if(tab&&tab!=='review'&&tab!=='notes'){
+    const q=queue();
+    q.forEach((c,i)=>{
+      if(c.trace==='missing'){Object.assign(c,{status:'discarded',why:REASONS[1],reviewed:Date.now()});return}
+      if(i%7===3){Object.assign(c,{status:'discarded',why:REASONS[i%2?3:2],reviewed:Date.now()});return}
+      if(i%5===1&&c.engine==='builtin'&&/^What is /.test(c.front))c.front=c.front.replace(/^What is /,'Define: ').replace(/\?$/,'');
+      const ed=isEdited(c); const box=i%6; Object.assign(c,{status:'library',edited:ed,reviewed:Date.now()-i*36e5,box,due:Date.now()+(i%3?BOX_DAYS[box]*DAY:-1),seen:box+1,right:box,lapses:i%4===0?1:0});
+    });
+    for(let d=0;d<5;d++)S.days[dkey(Date.now()-d*DAY)]={n:8+d*3,ok:6+d*2};
+  }
+}
+
+boot();
+</script>
+</body>
+</html>
