@@ -547,7 +547,8 @@ window.addEventListener('hashchange',()=>{if(!S)return;fromHash();render();windo
 /* ---------- text segmentation ---------- */
 const STOP=new Set(('a an the of to in on for and or but nor with without by from as at is are was were be been being it its this that these those there their they them then than so such not no can may might will would should could do does did has have had into onto over under about after before during between within per via each any all some more most less least very also only just both either neither whether while when where which who whom whose what why how if because although though your you our we us me my he she his her one two').split(' '));
 const PRON=new Set('it its this that these those they there here he she we you i which what when where why how if because although though all some most many each every both such one often always never also'.split(' '));
-const GENERIC=new Set('treatment treatments cause causes etiology signs symptoms example examples note notes location function functions definition diagnosis tip tips key important remember rule rules management indication indications contraindication contraindications features findings prognosis summary overview purpose goal goals'.split(' '));
+const GENERIC=new Set('treatment treatments cause causes etiology signs symptoms example examples note notes location function functions definition diagnosis tip tips key important remember rule rules management indication indications contraindication contraindications features findings prognosis summary overview purpose goal goals big dental trigger triggers risk risks presentation complications workup labs imaging prevention mechanism pathophysiology classic'.split(' '));
+const PREP=/^(in|at|for|with|on|during|after|before|when|if|by|from|to|of|as|without|within|unlike|like)\b/i;
 const clean=s=>s.replace(/\*\*|__|`/g,'').replace(/(^|[\s(])[*_]([^*_\s][^*_]*?)[*_](?=[\s).,;:!?]|$)/g,'$1$2').replace(/\s+/g,' ').trim();
 const stem=w=>w.length>4?w.replace(/ies$/,'y').replace(/(?:ing|ed|es|s)$/,''):w;
 const toks=s=>new Set((String(s).toLowerCase().match(/[a-z0-9]+(?:-[a-z0-9]+)*/g)||[]).filter(w=>w.length>2&&!STOP.has(w)).map(stem));
@@ -595,7 +596,7 @@ function defPattern(t){
   const m=t.match(/^([^:;]{2,60}?)\s*:\s+(.{6,})$/)||t.match(/^([^:;–—]{2,50}?)\s+[–—-]\s+(.{6,})$/)||t.match(/^([^=]{2,40}?)\s*=\s*(.{4,})$/);
   if(!m)return null;
   const term=m[1].trim().replace(/^\*+|\*+$/g,''), def=m[2].trim();
-  if(term.split(/\s+/).length>7||def.split(/\s+/).length<3||!/[A-Za-z]/.test(term)||/[.!?]$/.test(term))return null;
+  if(term.split(/\s+/).length>7||def.split(/\s+/).length<3||!/[A-Za-z]/.test(term)||/[.!?]$/.test(term)||PREP.test(term))return null;
   return{term,def};
 }
 const COP=/^(.{2,80}?)\s+(is defined as|are defined as|is called|are called|is known as|are known as|refers to|refer to|means|describes|represents|is|are)\s+(.+)$/i;
@@ -640,12 +641,12 @@ function enumPattern(t){
 }
 const NUMW='one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty|fifty|sixty|hundred';
 const UNITS='percent|mm|cm|µm|nm|ml|mL|mg|mcg|g|kg|°C|°F|degrees?|seconds?|secs?|minutes?|mins?|hours?|hrs?|days?|weeks?|months?|years?|teeth|roots?|canals?|cusps?|times|ppm|mmHg';
-const NUM_RE=new RegExp(`(?<![\\w-])(?:\\d+(?:[.,]\\d+)?(?:\\s?(?:-|–|to)\\s?\\d+(?:[.,]\\d+)?)?(?:\\s?%|\\s?(?:${UNITS})(?![\\w]))?|(?:${NUMW})(?:\\s?(?:-|–|to)\\s?(?:${NUMW}))?\\s(?:${UNITS})(?![\\w]))`,'i');
+const NUM_RE=new RegExp(`(?<![\\p{L}\\p{N}_-])(?:\\d+(?:[.,]\\d+)?(?:\\s?(?:-|–|to)\\s?\\d+(?:[.,]\\d+)?)?(?:\\s?%|\\s?(?:${UNITS})(?![\\p{L}\\p{N}_]))?|(?:${NUMW})(?:\\s?(?:-|–|to)\\s?(?:${NUMW}))?\\s(?:${UNITS})(?![\\p{L}\\p{N}_]))`,'iu');
 function numCloze(t){
   const wc=t.split(/\s+/).length; if(wc<5||wc>45)return null;
   const m=t.match(NUM_RE); if(!m)return null;
   const after=t.slice(m.index+m[0].length,m.index+m[0].length+2);
-  if(/^[,.]?\d|^-|^[A-Za-z]/.test(after))return null;
+  if(/^[,.]?\d|^-|^\p{L}|^[′'’]/u.test(after))return null;
   return{front:t.slice(0,m.index)+'_____'+t.slice(m.index+m[0].length),back:m[0]};
 }
 function conceptsOf(text,extra){
@@ -682,7 +683,7 @@ function extract(src,{max,types,skip}){
     const d=defPattern(t);
     if(d){
       const gen=GENERIC.has(d.term.toLowerCase().split(/\s+/)[0]);
-      const front=gen?`${cap(d.term)} for ${lcFirst(g.heading||src.title)}?`:`What ${isPlural(d.term)?'are':'is'} ${lcFirst(d.term)}?`;
+      const front=gen?`${g.heading||src.title} — ${lcFirst(d.term)}?`:`What ${isPlural(d.term)?'are':'is'} ${lcFirst(d.term)}?`;
       by.def.push({...base,type:'qa',front,back:cap(d.def),concept:gen?(g.heading||d.term):d.term});
       if(!gen)defs.push({term:d.term,def:d.def,heading:g.heading,base});
       used.add(i);return;
@@ -969,9 +970,9 @@ function addNoteHTML(){
   <label>Title<input type="text" id="nTitle" maxlength="120" value="${esc(U.draft.title)}" placeholder="e.g. Endo lecture 4"></label>
   <label>Notes<textarea id="nText" rows="8" placeholder="Paste lecture notes, a transcript or an outline. Headings and bullet points help the built-in drafter.">${esc(U.draft.text)}</textarea></label>
   <div class="btnrow"><button class="btn primary" data-act="saveNote">Save note</button>
-  <label class="btn" tabindex="0" id="uploadLbl" style="margin:0">Upload file<input type="file" id="nFile" accept=".txt,.md,.markdown,.pdf,.docx,text/plain,text/markdown,application/pdf" hidden></label>
+  <label class="btn" tabindex="0" id="uploadLbl" style="margin:0">Upload file<input type="file" id="nFile" accept=".txt,.md,.markdown,.pdf,.docx,.json,text/plain,text/markdown,application/pdf,application/json" hidden></label>
   <button class="btn ghost" data-act="sample">Use sample notes</button></div>
-  <p class="hint" id="nMsg">${esc(U.nMsg||'.txt, .md, .pdf or .docx. File text lands here first so you can trim it before saving.')}</p></section>`;
+  <p class="hint" id="nMsg">${esc(U.nMsg||'.txt, .md, .pdf or .docx. File text lands here first so you can trim it before saving. A notes pack (.json) adds its notes directly.')}</p></section>`;
 }
 function srcListHTML(sel){
   if(!S.sources.length)return `<section class="card"><h2>Your notes</h2><p class="empty">No notes yet.</p></section>`;
@@ -1439,7 +1440,12 @@ $('#view').addEventListener('change',async e=>{
   else if(t.id==='sDeck')U.studyCfg.deck=t.value;
   else if(t.id==='sN')U.studyCfg.n=t.value;
   else if(t.id==='nFile'&&t.files[0]){
-    const f=t.files[0]; U.nMsg='Reading '+f.name+'…'; $('#nMsg').textContent=U.nMsg;
+    const f=t.files[0]; t.value=''; U.nMsg='Reading '+f.name+'…'; $('#nMsg').textContent=U.nMsg;
+    if(/\.json$/i.test(f.name)){
+      try{const j=JSON.parse(await f.text());if(!j||!j.pack||!Array.isArray(j.sources))throw new Error('That .json isn’t a notes pack. Restore full backups from Settings.');U.nMsg='';importPack(j)}
+      catch(err){U.nMsg=err.message||'Couldn’t read that file.';render()}
+      return;
+    }
     try{
       const text=(await readFile(f)).replace(/\r\n?/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
       if(!text)throw new Error('No text found. A scanned PDF has no text layer; paste the text instead.');
@@ -1459,10 +1465,18 @@ $('#drawer').addEventListener('change',e=>{const t=e.target;if(t.id==='remember2
 $('#scrim').addEventListener('click',closeDrawer);
 $('#gear').addEventListener('click',()=>U&&(U.drawer?closeDrawer():openDrawer()));
 $('#lockBtn').addEventListener('click',()=>lockNow());
+function importPack(j){
+  const have=new Set(S.sources.map(s=>s.title+'\n'+s.text)); let last=null, n=0;
+  j.sources.forEach(s=>{if(!s||typeof s.text!=='string'||!s.text.trim()||have.has(s.title+'\n'+s.text))return;last=addSource(String(s.title||'Untitled note'),s.text);n++});
+  if(last)U.sel=last.id;
+  closeDrawer(); go('notes'); render();
+  toast(n?`Added ${plural(n,'note')}${j.name?' from “'+j.name+'”':''}. Pick one and draft cards.`:'Those notes are already here.');
+}
 $('#backupFile').addEventListener('change',async e=>{
   const f=e.target.files[0]; e.target.value=''; if(!f)return;
   try{
     const j=JSON.parse(await f.text());
+    if(j&&j.pack&&Array.isArray(j.sources)){importPack(j);return}
     if(!j||!Array.isArray(j.sources)||!Array.isArray(j.cards))throw new Error('That file isn’t a ToothOps Study backup.');
     if(!confirm(`Replace everything on this device with this backup (${plural(j.sources.length,'note')}, ${plural(j.cards.length,'card')})?`))return;
     S=migrate(j); await persist(); U=freshUI(); closeDrawer(); applyTheme(); go('notes'); render(); toast('Backup restored.');

@@ -9,7 +9,7 @@ A living study guide built from your own notes. It drafts flashcards and quiz qu
 
 ## How it works
 
-1. **Pick your source.** Paste notes or upload a `.txt`, `.md`, `.pdf` or `.docx`. Text from a file lands in the editor first so you can trim it before saving.
+1. **Pick your source.** Paste notes or upload a `.txt`, `.md`, `.pdf` or `.docx`. Text from a file lands in the editor first so you can trim it before saving. A notes pack (a `.json` file with `"pack": true` and a `sources` list) adds several notes at once without replacing anything.
 2. **Draft cards.** Choose a drafting engine:
    - **Built-in.** Runs in the browser with no key. It finds definitions (`Term: meaning`, `X is a…`), lists, numbers and key terms, and builds flashcards, fill-in-the-blanks and multiple-choice questions. Wrong answers come from related terms in the same note.
    - **Claude, Gemini or OpenAI.** Uses your own API key. Your browser sends the note straight to that provider.
